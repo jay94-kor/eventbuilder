@@ -1,0 +1,222 @@
+/* ==========================================================================
+   디자인 토큰 - CSS 커스텀 프로퍼티
+   ========================================================================== */
+
+:root {
+  /* 기본 반지름 */
+  --radius: 0.625rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  
+  /* 스페이싱 시스템 */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 0.75rem;    /* 12px */
+  --spacing-lg: 1rem;       /* 16px */
+  --spacing-xl: 1.25rem;    /* 20px */
+  --spacing-2xl: 1.5rem;    /* 24px */
+  --spacing-3xl: 2rem;      /* 32px */
+  --spacing-4xl: 2.5rem;    /* 40px */
+  --spacing-5xl: 3rem;      /* 48px */
+  --spacing-6xl: 4rem;      /* 64px */
+  
+  /* 컨테이너 최대 너비 */
+  --container-xs: 480px;
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+  --container-brand: 1200px;
+  
+  /* 라이트 테마 색상 */
+  --background: oklch(0.99 0.005 240 / 1);
+  --foreground: oklch(0.15 0.01 240 / 1);
+  --card: oklch(1 0.008 240 / 1);
+  --card-foreground: oklch(0.15 0.01 240 / 1);
+  --popover: oklch(1 0.008 240 / 1);
+  --popover-foreground: oklch(0.15 0.01 240 / 1);
+  --primary: oklch(0.55 0.2 250);
+  --primary-foreground: oklch(0.98 0.005 240);
+  --secondary: oklch(0.96 0.015 240);
+  --secondary-foreground: oklch(0.25 0.02 240);
+  --muted: oklch(0.96 0.015 240);
+  --muted-foreground: oklch(0.5 0.02 240);
+  --accent: oklch(0.94 0.03 260);
+  --accent-foreground: oklch(0.2 0.05 260);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 240);
+  --border: oklch(0.9 0.02 240);
+  --input: oklch(0.9 0.02 240);
+  --ring: oklch(0.55 0.2 250);
+  
+  /* 확장 색상 팔레트 */
+  --success: oklch(0.65 0.15 140);
+  --success-foreground: oklch(0.98 0.005 240);
+  --warning: oklch(0.7 0.18 70);
+  --warning-foreground: oklch(0.15 0.01 240);
+  --info: oklch(0.6 0.2 220);
+  --info-foreground: oklch(0.98 0.005 240);
+  
+  /* 차트 색상 */
+  --chart-1: oklch(0.6 0.2 250);
+  --chart-2: oklch(0.65 0.18 280);
+  --chart-3: oklch(0.7 0.15 200);
+  --chart-4: oklch(0.68 0.22 320);
+  --chart-5: oklch(0.62 0.25 30);
+  --chart-6: oklch(0.55 0.2 180);
+  --chart-7: oklch(0.58 0.18 300);
+  --chart-8: oklch(0.72 0.15 140);
+  --chart-9: oklch(0.65 0.2 60);
+  --chart-10: oklch(0.6 0.22 350);
+  
+  /* 사이드바 색상 */
+  --sidebar: oklch(0.98 0.01 240);
+  --sidebar-foreground: oklch(0.15 0.01 240);
+  --sidebar-primary: oklch(0.55 0.2 250);
+  --sidebar-primary-foreground: oklch(0.98 0.005 240);
+  --sidebar-accent: oklch(0.94 0.03 260);
+  --sidebar-accent-foreground: oklch(0.2 0.05 260);
+  --sidebar-border: oklch(0.9 0.02 240);
+  --sidebar-ring: oklch(0.55 0.2 250);
+  
+  /* 그림자 시스템 */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-brand: 0 10px 15px -3px oklch(var(--primary) / 0.2), 0 4px 6px -2px oklch(var(--primary) / 0.1);
+  --shadow-brand-strong: 0 20px 25px -5px oklch(var(--primary) / 0.3), 0 10px 10px -5px oklch(var(--primary) / 0.2);
+  --shadow-elevated: 0 25px 50px -12px oklch(var(--primary) / 0.1);
+  
+  /* 트랜지션 시스템 */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 다크 테마 */
+.dark {
+  --background: oklch(0.08 0.01 240 / 1);
+  --foreground: oklch(0.95 0.01 240 / 1);
+  --card: oklch(0.12 0.015 240 / 1);
+  --card-foreground: oklch(0.95 0.01 240 / 1);
+  --popover: oklch(0.12 0.015 240 / 1);
+  --popover-foreground: oklch(0.95 0.01 240 / 1);
+  --primary: oklch(0.7 0.25 250);
+  --primary-foreground: oklch(0.08 0.01 240);
+  --secondary: oklch(0.18 0.02 240);
+  --secondary-foreground: oklch(0.95 0.01 240);
+  --muted: oklch(0.18 0.02 240);
+  --muted-foreground: oklch(0.65 0.02 240);
+  --accent: oklch(0.2 0.04 260);
+  --accent-foreground: oklch(0.95 0.01 240);
+  --destructive: oklch(0.7 0.2 25);
+  --destructive-foreground: oklch(0.95 0.01 240);
+  --border: oklch(0.25 0.02 240);
+  --input: oklch(0.25 0.02 240);
+  --ring: oklch(0.7 0.25 250);
+  
+  /* 확장 색상 팔레트 - 다크 */
+  --success: oklch(0.7 0.18 140);
+  --success-foreground: oklch(0.08 0.01 240);
+  --warning: oklch(0.75 0.2 70);
+  --warning-foreground: oklch(0.08 0.01 240);
+  --info: oklch(0.7 0.22 220);
+  --info-foreground: oklch(0.08 0.01 240);
+  
+  /* 차트 색상 - 다크 */
+  --chart-1: oklch(0.7 0.25 250);
+  --chart-2: oklch(0.75 0.22 280);
+  --chart-3: oklch(0.8 0.18 200);
+  --chart-4: oklch(0.78 0.25 320);
+  --chart-5: oklch(0.72 0.28 30);
+  --chart-6: oklch(0.65 0.22 180);
+  --chart-7: oklch(0.68 0.2 300);
+  --chart-8: oklch(0.82 0.18 140);
+  --chart-9: oklch(0.75 0.22 60);
+  --chart-10: oklch(0.7 0.25 350);
+  
+  /* 사이드바 색상 - 다크 */
+  --sidebar: oklch(0.12 0.015 240);
+  --sidebar-foreground: oklch(0.95 0.01 240);
+  --sidebar-primary: oklch(0.7 0.25 250);
+  --sidebar-primary-foreground: oklch(0.08 0.01 240);
+  --sidebar-accent: oklch(0.2 0.04 260);
+  --sidebar-accent-foreground: oklch(0.95 0.01 240);
+  --sidebar-border: oklch(0.25 0.02 240);
+  --sidebar-ring: oklch(0.7 0.25 250);
+}
+
+/* ==========================================================================
+   애니메이션 키프레임 정의
+   ========================================================================== */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
