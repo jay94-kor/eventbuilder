@@ -19,7 +19,7 @@ interface GlobalConfig {
 }
 
 export default function ConfigureRfpPage() {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter()
   const [categories, setCategories] = useState<FeatureCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -141,7 +141,7 @@ export default function ConfigureRfpPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div role="status" aria-live="polite" className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="text-center">{t('common.loading')}</div>
         </div>
@@ -151,7 +151,7 @@ export default function ConfigureRfpPage() {
 
   if (error && !saving) {
     return (
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div role="alert" aria-live="assertive" className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="text-center text-red-600">{t('common.error_label')}{error}</div>
         </div>
@@ -176,28 +176,28 @@ export default function ConfigureRfpPage() {
         <div className="mb-8">
           <div className="flex items-center">
             <div className="flex items-center text-green-600">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-full text-white text-sm font-medium">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-full text-white text-sm font-medium" aria-hidden="true">
                 ✓
               </div>
               <span className="ml-2 text-label">{t('rfp_basic_info.step1_title')}</span>
             </div>
-            <div className="flex-1 mx-4 h-px bg-green-300"></div>
+            <div className="flex-1 mx-4 h-px bg-green-300" aria-hidden="true"></div>
             <div className="flex items-center text-green-600">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-full text-white text-sm font-medium">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-600 rounded-full text-white text-sm font-medium" aria-hidden="true">
                 ✓
               </div>
               <span className="ml-2 text-label">{t('rfp_basic_info.step2_title')}</span>
             </div>
-            <div className="flex-1 mx-4 h-px bg-green-300"></div>
+            <div className="flex-1 mx-4 h-px bg-green-300" aria-hidden="true"></div>
             <div className="flex items-center text-blue-600">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full text-white text-sm font-medium">
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full text-white text-sm font-medium" aria-hidden="true">
                 3
               </div>
               <span className="ml-2 text-label">{t('rfp_basic_info.step3_title')}</span>
             </div>
-            <div className="flex-1 mx-4 h-px bg-border"></div>
+            <div className="flex-1 mx-4 h-px bg-border" aria-hidden="true"></div>
             <div className="flex items-center text-muted-foreground">
-              <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full text-muted-foreground text-sm font-medium">
+              <div className="flex items-center justify-center w-8 h-8 bg-muted rounded-full text-muted-foreground text-sm font-medium" aria-hidden="true">
                 4
               </div>
               <span className="ml-2 text-label">{t('rfp_basic_info.step4_title')}</span>
@@ -207,7 +207,7 @@ export default function ConfigureRfpPage() {
 
         {/* 오류 메시지 */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+          <div role="alert" aria-live="assertive" className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
             <div className="text-sm text-red-600">{error}</div>
           </div>
         )}
@@ -216,7 +216,7 @@ export default function ConfigureRfpPage() {
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border-l-4 border-blue-500">
           <div className="flex items-center mb-4">
             <div className="p-2 bg-blue-100 rounded-lg mr-3">
-              <span className="text-2xl">📋</span>
+              <span className="text-2xl" role="img" aria-label="클립보드 아이콘">📋</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900">{t('rfp_configure.basic_info_section_title')}</h2>
           </div>
@@ -262,7 +262,7 @@ export default function ConfigureRfpPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg mr-3">
-                <span className="text-2xl">✅</span>
+                <span className="text-2xl" role="img" aria-label="체크 표시 아이콘">✅</span>
               </div>
               <h2 className="text-xl font-bold text-gray-900">
                 선택된 기능 ({selectedFeatures.length}개)
@@ -278,7 +278,7 @@ export default function ConfigureRfpPage() {
                 key={feature.id}
                 className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200 shadow-sm"
               >
-                <span className="mr-2">{feature.icon}</span>
+                <span className="mr-2" role="img" aria-label={`${feature.name} 아이콘`}>{feature.icon}</span>
                 {feature.name}
               </span>
             ))}
@@ -289,7 +289,7 @@ export default function ConfigureRfpPage() {
         <div className="mb-8">
           <div className="flex items-center mb-6">
             <div className="p-2 bg-purple-100 rounded-lg mr-3">
-              <span className="text-2xl">⚙️</span>
+              <span className="text-2xl" role="img" aria-label="톱니바퀴 아이콘">⚙️</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900">개별 기능 상세 설정</h2>
             <div className="ml-auto text-sm text-gray-500">

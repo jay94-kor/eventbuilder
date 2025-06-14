@@ -92,6 +92,48 @@ Next.js에 대한 자세한 내용은 다음 리소스를 참조하세요:
 
 [Next.js GitHub 저장소](https://github.com/vercel/next.js)에서 피드백과 기여를 환영합니다!
 
+## 국제화(i18n)
+
+`useTranslation` 훅을 사용할 때 `TypeError: t is not a function` 오류가 발생하는 경우, 이는 `useTranslation()` 훅의 반환 값을 잘못 처리했기 때문입니다. `useTranslation()`은 `t` 함수를 포함하는 객체를 반환하므로, `t`를 직접 사용하려면 구조 분해 할당을 통해 `t` 함수를 추출해야 합니다.
+
+**잘못된 사용 예시:**
+```typescript
+const t = useTranslation();
+t('some.key');
+```
+
+**올바른 사용 예시:**
+```typescript
+const { t } = useTranslation();
+t('some.key');
+```
+
+특히 Zod 스키마와 같이 훅이 허용되지 않는 컨텍스트에서 번역된 메시지를 사용해야 하는 경우, `useTranslation` 훅을 컴포넌트의 최상위 레벨에서 호출하고, 번역된 메시지를 변수에 저장한 다음, 이 변수를 Zod 스키마에 전달하는 방식을 사용해야 합니다.
+
+**Zod 스키마 내에서 올바른 사용 예시:**
+```typescript
+import React from 'react';
+import { useTranslation } from '@/lib/i18n';
+import { z } from 'zod';
+
+export default function MyComponent() {
+  const { t } = useTranslation();
+
+  const requiredMessage = t('validation.required');
+  const invalidEmailMessage = t('validation.invalid_email');
+
+  const mySchema = React.useMemo(() => {
+    return z.object({
+      email: z.string()
+        .min(1, requiredMessage)
+        .email(invalidEmailMessage),
+    });
+  }, [requiredMessage, invalidEmailMessage]);
+
+  // ...
+}
+```
+
 ## Vercel에 배포
 
 Next.js 앱을 배포하는 가장 쉬운 방법은 Next.js 개발팀에서 만든 [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)을 사용하는 것입니다.

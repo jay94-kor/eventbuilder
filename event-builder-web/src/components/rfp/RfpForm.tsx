@@ -31,7 +31,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
   const [filterInternal, setFilterInternal] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
 
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   const { rfpBasicInfo, selectedFeatures, setRfpData, toggleSelectedFeature } = useRfpStore();
   
@@ -188,7 +188,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
       <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-        <CardContent className="p-8 text-center">
+        <CardContent role="status" aria-live="polite" className="p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
@@ -202,25 +202,25 @@ export default function RfpForm({ initialData }: RfpFormProps) {
   if (error) return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
       <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-        <CardContent className="p-8 text-center">
+        <CardContent role="alert" aria-live="assertive" className="p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
             <span className="text-3xl">⚠️</span>
           </div>
-          <h3 className="text-lg font-semibold text-red-700 mb-2">오류가 발생했습니다</h3>
+          <h3 className="text-lg font-semibold text-red-700 mb-2">{t('common.error_occurred')}</h3>
           <p className="text-red-600 text-sm">{error}</p>
-          <Button 
-            onClick={fetchFeatures} 
+          <Button
+            onClick={fetchFeatures}
             className="mt-4"
             variant="outline"
           >
-            다시 시도
+            {t('common.try_again')}
           </Button>
         </CardContent>
       </Card>
     </div>
   );
 
-  const step2Title = isEditMode ? 'RFP 수정 - 기능 선택' : t('common.select_elements');
+  const step2Title = isEditMode ? t('rfpForm.edit_mode_title') : t('common.select_elements');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -228,23 +228,23 @@ export default function RfpForm({ initialData }: RfpFormProps) {
         {/* 페이지 헤더 */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-4">
-            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-            {isEditMode ? 'RFP 수정' : 'RFP 생성'}
+            <span className="w-2 h-2 bg-blue-500 rounded-full mr-2" aria-hidden="true"></span>
+            {isEditMode ? t('rfpForm.edit_rfp') : t('rfpForm.create_rfp')}
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {isEditMode ? '기능 선택 수정' : '행사 구성 요소 선택'}
+            {isEditMode ? t('rfpForm.edit_features') : t('rfpForm.select_event_components')}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {isEditMode 
-              ? 'RFP의 구성 요소를 수정합니다.' 
-              : '원하는 행사 구성 요소를 선택하여 맞춤형 RFP를 생성하세요.'
+            {isEditMode
+              ? t('rfpForm.edit_components_description')
+              : t('rfpForm.select_components_description')
             }
           </p>
           <div className="flex items-center justify-center mt-4">
             <div className="bg-white/80 backdrop-blur-sm px-6 py-2 rounded-full border shadow-sm">
               <div className="flex items-center text-blue-600">
-                <CheckIcon className="w-4 h-4 mr-2" />
-                <span className="text-sm font-medium">{selectedFeatures.length}개 선택됨</span>
+                <CheckIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                <span className="text-sm font-medium">{t('rfpForm.features_selected', { count: selectedFeatures.length })}</span>
               </div>
             </div>
           </div>
@@ -257,15 +257,15 @@ export default function RfpForm({ initialData }: RfpFormProps) {
               {/* 1단계 - 완료 */}
               <div className="flex items-center">
                 <div className="flex items-center justify-center w-10 h-10 bg-green-500 rounded-full shadow-lg">
-                  <CheckIcon className="w-5 h-5 text-white" />
+                  <CheckIcon className="w-5 h-5 text-white" aria-hidden="true" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-green-600">완료</p>
+                  <p className="text-sm font-medium text-green-600">{t('common.status_completed')}</p>
                   <p className="text-xs text-green-500">{t('rfp_basic_info.step1_title')}</p>
                 </div>
               </div>
               
-              <div className="flex-1 mx-4 h-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+              <div className="flex-1 mx-4 h-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-full" aria-hidden="true"></div>
               
               {/* 2단계 - 현재 */}
               <div className="flex items-center">
@@ -273,12 +273,12 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                   <span className="text-white font-semibold">2</span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-blue-600">진행 중</p>
+                  <p className="text-sm font-medium text-blue-600">{t('common.status_in_progress')}</p>
                   <p className="text-xs text-blue-500">{t('rfp_basic_info.step2_title')}</p>
                 </div>
               </div>
               
-              <div className="flex-1 mx-4 h-1 bg-gray-200 rounded-full"></div>
+              <div className="flex-1 mx-4 h-1 bg-gray-200 rounded-full" aria-hidden="true"></div>
               
               {/* 3단계 - 대기 */}
               <div className="flex items-center">
@@ -286,12 +286,12 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                   <span className="text-gray-500 font-semibold">3</span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">대기</p>
+                  <p className="text-sm font-medium text-gray-500">{t('common.status_pending')}</p>
                   <p className="text-xs text-gray-400">{t('rfp_basic_info.step3_title')}</p>
                 </div>
               </div>
               
-              <div className="flex-1 mx-4 h-1 bg-gray-200 rounded-full"></div>
+              <div className="flex-1 mx-4 h-1 bg-gray-200 rounded-full" aria-hidden="true"></div>
               
               {/* 4단계 - 대기 */}
               <div className="flex items-center">
@@ -299,7 +299,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                   <span className="text-gray-500 font-semibold">4</span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">대기</p>
+                  <p className="text-sm font-medium text-gray-500">{t('common.status_pending')}</p>
                   <p className="text-xs text-gray-400">{t('rfp_basic_info.step4_title')}</p>
                 </div>
               </div>
@@ -321,8 +321,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <SearchIcon className="w-5 h-5 text-blue-500 mr-2" />
-                <CardTitle className="text-xl text-gray-900">기능 검색 및 필터</CardTitle>
+                <SearchIcon className="w-5 h-5 text-blue-500 mr-2" aria-hidden="true" />
+                <CardTitle className="text-xl text-gray-900">{t('rfpForm.search_filter_title')}</CardTitle>
               </div>
               {hasActiveFilters && (
                 <Button
@@ -331,7 +331,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                   onClick={clearAllFilters}
                   className="text-gray-600 hover:text-gray-800"
                 >
-                  필터 초기화
+                  {t('rfpForm.clear_filters_button')}
                 </Button>
               )}
             </div>
@@ -339,10 +339,10 @@ export default function RfpForm({ initialData }: RfpFormProps) {
           <CardContent className="space-y-6">
             {/* 검색바 */}
             <div className="relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
               <Input
                 type="text"
-                placeholder="기능명이나 설명으로 검색하세요..."
+                placeholder={t('rfpForm.search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
@@ -357,23 +357,23 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 className="text-gray-600 hover:text-gray-800"
               >
-                <FilterIcon className="w-4 h-4 mr-2" />
-                고급 필터
+                <FilterIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                {t('rfpForm.advanced_filters_button')}
                 {showAdvancedFilters ? (
-                  <ChevronUpIcon className="w-4 h-4 ml-2" />
+                  <ChevronUpIcon className="w-4 h-4 ml-2" aria-hidden="true" />
                 ) : (
-                  <ChevronDownIcon className="w-4 h-4 ml-2" />
+                  <ChevronDownIcon className="w-4 h-4 ml-2" aria-hidden="true" />
                 )}
               </Button>
               {hasActiveFilters && (
                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                   {[
-                    searchTerm && '검색',
-                    selectedCategories.size > 0 && `카테고리 ${selectedCategories.size}개`,
-                    filterPremium && '프리미엄',
-                    filterBudget && '예산배정',
-                    filterInternal && '내부리소스'
-                  ].filter(Boolean).join(', ')} 적용
+                    searchTerm && t('rfpForm.filter_search'),
+                    selectedCategories.size > 0 && t('rfpForm.filter_categories', { count: selectedCategories.size }),
+                    filterPremium && t('features.premium'),
+                    filterBudget && t('features.budget_allocation'),
+                    filterInternal && t('features.internal_resource')
+                  ].filter(Boolean).join(', ')} {t('rfpForm.filter_applied')}
                 </Badge>
               )}
             </div>
@@ -383,7 +383,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
               <div className="space-y-4 pt-4 border-t border-gray-100">
                 {/* 카테고리 필터 */}
                 <div>
-                  <Label className="text-sm font-semibold text-gray-700 mb-3 block">카테고리별 필터</Label>
+                  <Label className="text-sm font-semibold text-gray-700 mb-3 block">{t('rfpForm.category_filter_title')}</Label>
                   <div className="flex flex-wrap gap-2">
                     {categories.map(category => (
                       <div key={category.id} className="flex items-center">
@@ -403,8 +403,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                           }}
                           className="mr-2"
                         />
-                        <Label 
-                          htmlFor={`category-${category.id}`} 
+                        <Label
+                          htmlFor={`category-${category.id}`}
                           className="cursor-pointer text-sm px-3 py-1 rounded-full border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
                         >
                           {t(`featureCategories.${category.name.toLowerCase().replace(/[\s·]/g, '_').replace(/[^\w가-힣]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')}`)}
@@ -416,7 +416,7 @@ export default function RfpForm({ initialData }: RfpFormProps) {
 
                 {/* 특성별 필터 */}
                 <div>
-                  <Label className="text-sm font-semibold text-gray-700 mb-3 block">특성별 필터</Label>
+                  <Label className="text-sm font-semibold text-gray-700 mb-3 block">{t('rfpForm.attribute_filter_title')}</Label>
                   <div className="flex flex-wrap gap-3">
                     <div className="flex items-center">
                       <Checkbox
@@ -425,8 +425,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                         onCheckedChange={(checked) => setFilterPremium(checked as boolean)}
                         className="mr-2"
                       />
-                      <Label 
-                        htmlFor="filterPremium" 
+                      <Label
+                        htmlFor="filterPremium"
                         className="cursor-pointer text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200"
                       >
                         ✨ {t('features.premium')}
@@ -439,8 +439,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                         onCheckedChange={(checked) => setFilterBudget(checked as boolean)}
                         className="mr-2"
                       />
-                      <Label 
-                        htmlFor="filterBudget" 
+                      <Label
+                        htmlFor="filterBudget"
                         className="cursor-pointer text-sm px-3 py-1 rounded-full bg-green-100 text-green-800 border border-green-200"
                       >
                         💰 {t('features.budget_allocation')}
@@ -453,8 +453,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                         onCheckedChange={(checked) => setFilterInternal(checked as boolean)}
                         className="mr-2"
                       />
-                      <Label 
-                        htmlFor="filterInternal" 
+                      <Label
+                        htmlFor="filterInternal"
                         className="cursor-pointer text-sm px-3 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200"
                       >
                         👥 {t('features.internal_resource')}
@@ -484,13 +484,13 @@ export default function RfpForm({ initialData }: RfpFormProps) {
             <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm">
               <CardContent className="text-center py-16">
                 <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                  <SearchIcon className="w-12 h-12 text-gray-400" />
+                  <SearchIcon className="w-12 h-12 text-gray-400" aria-hidden="true" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">검색 결과가 없습니다</h3>
-                <p className="text-gray-600 mb-6">다른 검색어를 시도하거나 필터를 조정해보세요.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('rfpForm.no_results_title')}</h3>
+                <p className="text-gray-600 mb-6">{t('rfpForm.no_results_description')}</p>
                 {hasActiveFilters && (
                   <Button onClick={clearAllFilters} variant="outline">
-                    모든 필터 초기화
+                    {t('rfpForm.clear_all_filters_button')}
                   </Button>
                 )}
               </CardContent>
@@ -507,15 +507,15 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                 variant="outline"
                 className="flex items-center px-6 py-3"
               >
-                <ArrowLeftIcon className="w-4 h-4 mr-2" />
-                이전 단계
+                <ArrowLeftIcon className="w-4 h-4 mr-2" aria-hidden="true" />
+                {t('rfpForm.previous_step_button')}
               </Button>
               
               <div className="text-center">
                 <p className="text-sm text-gray-600">
-                  {selectedFeatures.length > 0 
-                    ? `${selectedFeatures.length}개 기능이 선택되었습니다`
-                    : '최소 1개 이상의 기능을 선택해주세요'
+                  {selectedFeatures.length > 0
+                    ? t('rfpForm.features_selected_count', { count: selectedFeatures.length })
+                    : t('rfpForm.min_one_feature_required')
                   }
                 </p>
               </div>
@@ -525,8 +525,8 @@ export default function RfpForm({ initialData }: RfpFormProps) {
                 disabled={selectedFeatures.length === 0}
                 className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                다음 단계
-                <ArrowRightIcon className="w-4 h-4 ml-2" />
+                {t('rfpForm.next_step_button')}
+                <ArrowRightIcon className="w-4 h-4 ml-2" aria-hidden="true" />
               </Button>
             </div>
           </CardContent>

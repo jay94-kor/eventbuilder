@@ -19,7 +19,7 @@ export default function FeatureCard({
   displayMode = 'detailed',
   disabled = false,
 }: FeatureCardProps) {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const hasConfigFields = feature.config?.fields?.length > 0;
 
   if (displayMode === 'simple') {
@@ -47,7 +47,7 @@ export default function FeatureCard({
         tabIndex={disabled ? -1 : 0}
         role="button"
         aria-pressed={isSelected}
-        aria-label={`${feature.name} ${isSelected ? '선택됨' : '선택하지 않음'} ${disabled ? '비활성화됨' : ''}`}
+        aria-label={`${feature.name} ${isSelected ? t('featureCard.selected') : t('featureCard.notSelected')} ${disabled ? t('featureCard.disabled') : ''}`}
       >
         <div className="flex items-center gap-3">
           <div className="text-2xl flex-shrink-0 transform group-hover:scale-110 transition-transform duration-200">

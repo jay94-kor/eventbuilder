@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isLoading) {
@@ -47,12 +47,12 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <Link href="/login">
                 <Button variant="outline">
-                  로그인
+                  {t('home.login_button')}
                 </Button>
               </Link>
               <Link href="/register">
                 <Button>
-                  회원가입
+                  {t('home.register_button')}
                 </Button>
               </Link>
             </div>
@@ -66,20 +66,19 @@ export default function HomePage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                스마트한 행사 기획
+                {t('home.hero_title_part1')}
               </span>
               <br />
-              <span className="text-gray-900">이제 더 쉽게</span>
+              <span className="text-gray-900">{t('home.hero_title_part2')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-              블록형 인터페이스로 행사 구성 요소를 선택하고, 
-              <br />체계적인 RFP를 자동으로 생성하세요.
+              {t('home.hero_description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link href="/register">
                 <Button size="lg" className="text-lg px-8 py-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200">
-                  무료로 시작하기
+                  {t('home.start_free_button')}
                   <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -87,7 +86,7 @@ export default function HomePage() {
               </Link>
               <Link href="/login">
                 <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-gray-50 transform hover:scale-105 transition-all duration-200">
-                  데모 보기
+                  {t('home.view_demo_button')}
                 </Button>
               </Link>
             </div>
@@ -98,7 +97,7 @@ export default function HomePage() {
                 <div className="bg-gradient-to-r from-gray-100 to-gray-200 h-96 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-6xl mb-4">📋</div>
-                    <p className="text-gray-600 text-lg">인터랙티브 데모</p>
+                    <p className="text-gray-600 text-lg">{t('home.interactive_demo')}</p>
                   </div>
                 </div>
               </div>
@@ -115,10 +114,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              왜 Bidly를 선택해야 할까요?
+              {t('home.why_choose_bidly_title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              복잡한 행사 기획 과정을 단순화하고 체계화하여 더 나은 결과를 만들어냅니다.
+              {t('home.why_choose_bidly_description')}
             </p>
           </div>
 
@@ -126,30 +125,30 @@ export default function HomePage() {
             <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               <div className="text-5xl mb-4">🎯</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                맞춤형 추천
+                {t('home.custom_recommendations_title')}
               </h3>
               <p className="text-gray-600">
-                선택한 행사 요소에 따라 관련 구성요소를 자동으로 추천하여 빠뜨리는 것이 없도록 도와드립니다.
+                {t('home.custom_recommendations_description')}
               </p>
             </div>
 
             <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               <div className="text-5xl mb-4">📊</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                체계적 관리
+                {t('home.systematic_management_title')}
               </h3>
               <p className="text-gray-600">
-                생성된 RFP를 대시보드에서 한눈에 관리하고, 진행 상황을 실시간으로 추적할 수 있습니다.
+                {t('home.systematic_management_description')}
               </p>
             </div>
 
             <div className="text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               <div className="text-5xl mb-4">⚡</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                빠른 생성
+                {t('home.fast_creation_title')}
               </h3>
               <p className="text-gray-600">
-                블록형 인터페이스로 직관적으로 행사 요소를 선택하고, 몇 분만에 전문적인 RFP를 완성하세요.
+                {t('home.fast_creation_description')}
               </p>
             </div>
           </div>
@@ -160,15 +159,14 @@ export default function HomePage() {
       <section className="py-24 bg-gradient-to-r from-blue-600 to-indigo-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            지금 시작해보세요
+            {t('home.start_now_title')}
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            무료 계정으로 시작하여 첫 번째 RFP를 생성해보세요. 
-            전문적인 행사 기획이 이렇게 쉬울 줄 몰랐을 거예요.
+            {t('home.start_now_description')}
           </p>
           <Link href="/register">
             <Button size="lg" className="text-lg px-8 py-6 rounded-xl bg-white text-blue-600 hover:bg-gray-50 transform hover:scale-105 transition-all duration-200">
-              무료 회원가입
+              {t('home.free_register_button')}
             </Button>
           </Link>
         </div>
@@ -182,11 +180,11 @@ export default function HomePage() {
               Bidly
             </div>
             <p className="text-gray-400">
-              © 2024 Bidly. 모든 권리 보유.
+              {t('home.copyright_text')}
             </p>
           </div>
         </div>
       </footer>
     </div>
   );
-} 
+}

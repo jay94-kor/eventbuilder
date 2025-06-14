@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/design-system';
+import { useTranslation } from '@/lib/i18n';
 
 interface StatsCardProps {
   title: string;
@@ -43,6 +44,8 @@ export default function StatsCard({
     return 'from-blue-50 to-blue-100';
   };
 
+  const { t } = useTranslation();
+
   return (
     <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-lg">
       {/* 배경 그라데이션 */}
@@ -53,7 +56,7 @@ export default function StatsCard({
       <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full -ml-8 -mb-8"></div>
       
       <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-sm font-semibold text-gray-700">{title}</CardTitle>
+        <CardTitle className="text-sm font-semibold text-gray-700">{t(title)}</CardTitle>
         {icon && (
           <div className={`flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${getGradientClasses(color)} shadow-lg`}>
             <div className="text-white text-lg">
@@ -67,14 +70,14 @@ export default function StatsCard({
         <div className="text-4xl font-bold text-gray-900 mb-2">{value}</div>
         
         {description && (
-          <CardDescription className="text-gray-600 text-sm leading-relaxed">{description}</CardDescription>
+          <CardDescription className="text-gray-600 text-sm leading-relaxed">{t(description)}</CardDescription>
         )}
         
         {trend && (
           <div className={cn(
             "mt-3 flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full w-fit",
-            trend.isPositive 
-              ? 'text-green-700 bg-green-100 border border-green-200' 
+            trend.isPositive
+              ? 'text-green-700 bg-green-100 border border-green-200'
               : 'text-red-700 bg-red-100 border border-red-200'
           )}>
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

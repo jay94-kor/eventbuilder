@@ -15,7 +15,7 @@ interface OnboardingWelcomeProps {
 }
 
 const OnboardingWelcome: React.FC<OnboardingWelcomeProps> = ({ userName = '사용자' }) => {
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   const features = [
     {

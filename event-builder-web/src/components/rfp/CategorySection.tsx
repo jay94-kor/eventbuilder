@@ -27,7 +27,7 @@ export default function CategorySection({
   selectedFeatureIds,
   onFeatureSelect,
 }: CategorySectionProps) {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const translatedKey = normalizeToSnakeCase(categoryName);
   const displayCategoryName = t(`featureCategories.${translatedKey}`);
   const selectedCount = features.filter(feature => selectedFeatureIds.includes(feature.id)).length;

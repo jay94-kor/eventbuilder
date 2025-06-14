@@ -16,7 +16,7 @@ import { HelpCircleIcon } from 'lucide-react'; // HelpCircleIcon 임포트
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout, setOnboarded } = useAuth(); // setOnboarded 추가
-  const t = useTranslation(); // useTranslation 훅 사용
+  const { t } = useTranslation(); // useTranslation 훅 사용
   const { currentLanguage, setLanguage } = useLanguageStore(); // languageStore에서 상태와 액션 가져오기
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);

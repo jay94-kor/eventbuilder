@@ -21,7 +21,7 @@ export default function DynamicFeatureForm({
   errors = {},
   eventZones = []
 }: DynamicFeatureFormProps) {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean>>({})
 
   // 필드 가시성 계산 - useMemo로 최적화
@@ -580,15 +580,15 @@ export default function DynamicFeatureForm({
           <div className="flex flex-wrap items-center gap-6 text-sm">
             <span className="flex items-center bg-white px-4 py-2 rounded-xl shadow-sm">
               <span className="mr-2 text-lg">🏢</span>
-              <span className="font-semibold text-blue-700">기본 정보</span>
+              <span className="font-semibold text-blue-700">{t('dynamic_form.group_basic_info')}</span>
             </span>
             <span className="flex items-center bg-white px-4 py-2 rounded-xl shadow-sm">
               <span className="mr-2 text-lg">📅</span>
-              <span className="font-semibold text-purple-700">일정 관리</span>
+              <span className="font-semibold text-purple-700">{t('dynamic_form.group_schedule_management')}</span>
             </span>
             <span className="flex items-center bg-white px-4 py-2 rounded-xl shadow-sm">
               <span className="mr-2 text-lg">⚙️</span>
-              <span className="font-semibold text-emerald-700">운영 설정</span>
+              <span className="font-semibold text-emerald-700">{t('dynamic_form.group_operation_settings')}</span>
             </span>
           </div>
         </div>
@@ -598,29 +598,29 @@ export default function DynamicFeatureForm({
       {hasGroups ? (
         <div className="space-y-8">
           {renderGroup(
-            "기본 정보", 
-            "🏢", 
+            t('dynamic_form.group_basic_info'),
+            "🏢",
             groups.basic,
             "from-blue-50/80 to-indigo-50/80 border-blue-200/50"
           )}
           
           {renderGroup(
-            "일정 관리", 
-            "📅", 
+            t('dynamic_form.group_schedule_management'),
+            "📅",
             groups.schedule,
             "from-purple-50/80 to-pink-50/80 border-purple-200/50"
           )}
           
           {renderGroup(
-            "운영 설정", 
-            "⚙️", 
+            t('dynamic_form.group_operation_settings'),
+            "⚙️",
             groups.operation,
             "from-emerald-50/80 to-green-50/80 border-emerald-200/50"
           )}
           
           {groups.others.length > 0 && renderGroup(
-            "기타 설정", 
-            "📋", 
+            t('dynamic_form.group_other_settings'),
+            "📋",
             groups.others,
             "from-gray-50/80 to-slate-50/80 border-gray-200/50"
           )}

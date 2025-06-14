@@ -23,7 +23,7 @@ type WizardStep = 'concept' | 'build' | 'review'
 
 export default function CreateRfpPage() {
   const router = useRouter()
-  const t = useTranslation()
+  const { t } = useTranslation()
   
   // 위저드 상태
   const [currentStep, setCurrentStep] = useState<WizardStep>('concept')
@@ -167,10 +167,10 @@ export default function CreateRfpPage() {
         resetRfpStore()
         router.push('/dashboard')
       } else {
-        setError(response.message || 'RFP 생성에 실패했습니다.')
+        setError(response.message || t('rfp_create_page.creation_failed_alert'))
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'RFP 저장 오류가 발생했습니다.')
+      setError(err instanceof Error ? err.message : t('rfp_create_page.save_error_alert'))
     } finally {
       setSaving(false)
     }
@@ -180,11 +180,11 @@ export default function CreateRfpPage() {
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
       <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-        <CardContent className="p-8 text-center">
+        <CardContent role="status" aria-live="polite" className="p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-lg font-medium text-gray-700">기능 목록을 불러오는 중...</p>
+          <p className="text-lg font-medium text-gray-700">{t('rfp_create_page.loading_features')}</p>
         </CardContent>
       </Card>
     </div>
@@ -203,114 +203,114 @@ export default function CreateRfpPage() {
         {/* 헤더 */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 rounded-3xl mb-6 shadow-2xl">
-            <span className="text-3xl">✨</span>
+            <span className="text-3xl" role="img" aria-label="반짝이는 별 아이콘">✨</span>
           </div>
           <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-            RFP 생성 위저드
+            {t('rfp_create_page.wizard_title')}
           </h1>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            3단계로 간단하게 <span className="font-semibold text-purple-600">전문적인 RFP</span>를 만들어보세요
+            {t('rfp_create_page.wizard_subtitle')}
           </p>
         </div>
 
         {/* 진행 상태 표시 */}
         <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-md mb-12 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-indigo-500/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-indigo-500/5" aria-hidden="true"></div>
           <CardContent className="p-8 relative">
             <div className="flex items-center justify-between">
               {/* 1단계 - 컨셉 */}
               <div className="flex items-center group">
                 <div className={`
                   relative flex items-center justify-center w-16 h-16 rounded-2xl shadow-xl transition-all duration-500 transform hover:scale-105
-                  ${currentStep === 'concept' 
-                    ? 'bg-gradient-to-br from-purple-500 to-pink-500 animate-pulse shadow-purple-500/25' 
-                    : canProceedFromConcept 
-                      ? 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-emerald-500/25' 
+                  ${currentStep === 'concept'
+                    ? 'bg-gradient-to-br from-purple-500 to-pink-500 animate-pulse shadow-purple-500/25'
+                    : canProceedFromConcept
+                      ? 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-emerald-500/25'
                       : 'bg-gradient-to-br from-gray-300 to-gray-400'
                   }
                 `}>
                   {canProceedFromConcept && currentStep !== 'concept' ? (
-                    <CheckIcon className="w-8 h-8 text-white" />
+                    <CheckIcon className="w-8 h-8 text-white" aria-hidden="true" />
                   ) : (
                     <span className={`font-bold text-lg ${
                       currentStep === 'concept' || canProceedFromConcept ? 'text-white' : 'text-gray-500'
-                    }`}>1</span>
+                    }`} aria-hidden="true">1</span>
                   )}
                   {currentStep === 'concept' && (
-                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur opacity-30 animate-pulse"></div>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur opacity-30 animate-pulse" aria-hidden="true"></div>
                   )}
                 </div>
                 <div className="ml-4">
                   <p className={`text-lg font-bold transition-all duration-300 ${
-                    currentStep === 'concept' ? 'text-purple-600' : 
+                    currentStep === 'concept' ? 'text-purple-600' :
                     canProceedFromConcept ? 'text-emerald-600' : 'text-gray-500'
                   }`}>
-                    {currentStep === 'concept' ? '🎯 진행 중' : canProceedFromConcept ? '✅ 완료' : '⏳ 대기'}
+                    {currentStep === 'concept' ? t('rfp_create_page.step_concept_status_in_progress') : canProceedFromConcept ? t('rfp_create_page.step_concept_status_completed') : t('rfp_create_page.step_concept_status_pending')}
                   </p>
-                  <p className="text-sm text-gray-700 font-medium">컨셉 정의</p>
+                  <p className="text-sm text-gray-700 font-medium">{t('rfp_create_page.step_concept_title')}</p>
                 </div>
               </div>
               
               <div className={`flex-1 mx-6 h-2 rounded-full transition-all duration-500 ${
                 canProceedFromConcept ? 'bg-gradient-to-r from-emerald-400 via-purple-400 to-pink-400' : 'bg-gray-300'
-              }`}></div>
+              }`} aria-hidden="true"></div>
               
               {/* 2단계 - 구성 */}
               <div className="flex items-center group">
                 <div className={`
                   relative flex items-center justify-center w-16 h-16 rounded-2xl shadow-xl transition-all duration-500 transform hover:scale-105
-                  ${currentStep === 'build' 
-                    ? 'bg-gradient-to-br from-blue-500 to-indigo-500 animate-pulse shadow-blue-500/25' 
-                    : canProceedFromBuild 
-                      ? 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-emerald-500/25' 
+                  ${currentStep === 'build'
+                    ? 'bg-gradient-to-br from-blue-500 to-indigo-500 animate-pulse shadow-blue-500/25'
+                    : canProceedFromBuild
+                      ? 'bg-gradient-to-br from-emerald-500 to-green-500 shadow-emerald-500/25'
                       : 'bg-gradient-to-br from-gray-300 to-gray-400'
                   }
                 `}>
                   {canProceedFromBuild && currentStep !== 'build' ? (
-                    <CheckIcon className="w-8 h-8 text-white" />
+                    <CheckIcon className="w-8 h-8 text-white" aria-hidden="true" />
                   ) : (
                     <span className={`font-bold text-lg ${
                       currentStep === 'build' || canProceedFromBuild ? 'text-white' : 'text-gray-500'
-                    }`}>2</span>
+                    }`} aria-hidden="true">2</span>
                   )}
                   {currentStep === 'build' && (
-                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-30 animate-pulse"></div>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-30 animate-pulse" aria-hidden="true"></div>
                   )}
                 </div>
                 <div className="ml-4">
                   <p className={`text-lg font-bold transition-all duration-300 ${
-                    currentStep === 'build' ? 'text-blue-600' : 
+                    currentStep === 'build' ? 'text-blue-600' :
                     canProceedFromBuild ? 'text-emerald-600' : 'text-gray-500'
                   }`}>
-                    {currentStep === 'build' ? '🔧 진행 중' : canProceedFromBuild ? '✅ 완료' : '⏳ 대기'}
+                    {currentStep === 'build' ? t('rfp_create_page.step_build_status_in_progress') : canProceedFromBuild ? t('rfp_create_page.step_build_status_completed') : t('rfp_create_page.step_build_status_pending')}
                   </p>
-                  <p className="text-sm text-gray-700 font-medium">구성 선택</p>
+                  <p className="text-sm text-gray-700 font-medium">{t('rfp_create_page.step_build_title')}</p>
                 </div>
               </div>
               
               <div className={`flex-1 mx-6 h-2 rounded-full transition-all duration-500 ${
                 canProceedFromBuild ? 'bg-gradient-to-r from-emerald-400 via-blue-400 to-indigo-400' : 'bg-gray-300'
-              }`}></div>
+              }`} aria-hidden="true"></div>
               
               {/* 3단계 - 완성 */}
               <div className="flex items-center group">
                 <div className={`
                   relative flex items-center justify-center w-16 h-16 rounded-2xl shadow-xl transition-all duration-500 transform hover:scale-105
-                  ${currentStep === 'review' 
-                    ? 'bg-gradient-to-br from-emerald-500 to-cyan-500 animate-pulse shadow-emerald-500/25' 
+                  ${currentStep === 'review'
+                    ? 'bg-gradient-to-br from-emerald-500 to-cyan-500 animate-pulse shadow-emerald-500/25'
                     : 'bg-gradient-to-br from-gray-300 to-gray-400'
                   }
                 `}>
-                  <span className={`font-bold text-lg ${currentStep === 'review' ? 'text-white' : 'text-gray-500'}`}>3</span>
+                  <span className={`font-bold text-lg ${currentStep === 'review' ? 'text-white' : 'text-gray-500'}`} aria-hidden="true">3</span>
                   {currentStep === 'review' && (
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur opacity-30 animate-pulse"></div>
+                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur opacity-30 animate-pulse" aria-hidden="true"></div>
                   )}
                 </div>
                 <div className="ml-4">
                   <p className={`text-lg font-bold transition-all duration-300 ${currentStep === 'review' ? 'text-emerald-600' : 'text-gray-500'}`}>
-                    {currentStep === 'review' ? '🎯 진행 중' : '⏳ 대기'}
+                    {currentStep === 'review' ? t('rfp_create_page.step_review_status_in_progress') : t('rfp_create_page.step_review_status_pending')}
                   </p>
-                  <p className="text-sm text-gray-700 font-medium">검토 및 완성</p>
+                  <p className="text-sm text-gray-700 font-medium">{t('rfp_create_page.step_review_title')}</p>
                 </div>
               </div>
             </div>
@@ -322,19 +322,19 @@ export default function CreateRfpPage() {
           {/* 1단계: 컨셉 정의 */}
           {currentStep === 'concept' && (
             <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-indigo-500/10"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-indigo-500/10" aria-hidden="true"></div>
               <CardHeader className="text-center relative z-10 pb-8">
                 <div className="relative inline-block mb-6">
                   <div className="w-24 h-24 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-purple-500/25 transform hover:scale-105 transition-all duration-300">
-                    <span className="text-white text-4xl">💡</span>
+                    <span className="text-white text-4xl" role="img" aria-label="아이디어 전구 아이콘">💡</span>
                   </div>
-                  <div className="absolute -inset-3 bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 rounded-3xl opacity-20 blur-xl animate-pulse"></div>
+                  <div className="absolute -inset-3 bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 rounded-3xl opacity-20 blur-xl animate-pulse" aria-hidden="true"></div>
                 </div>
                 <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-                  어떤 행사를 만들고 싶나요?
+                  {t('rfp_create_page.concept_section_title')}
                 </CardTitle>
                 <CardDescription className="text-lg text-gray-600 max-w-lg mx-auto">
-                  아이디어만 있어도 괜찮아요. <span className="font-semibold text-purple-600">함께 구체화</span>해 나가겠습니다.
+                  {t('rfp_create_page.concept_section_description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8 relative z-10">
@@ -342,15 +342,15 @@ export default function CreateRfpPage() {
                 <div className="space-y-4 bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border border-purple-200/50">
                   <Label htmlFor="title" className="text-xl font-bold flex items-center text-gray-800">
                     <div className="w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full mr-3 flex items-center justify-center">
-                      <span className="w-2 h-2 bg-white rounded-full"></span>
+                      <span className="w-2 h-2 bg-white rounded-full" aria-hidden="true"></span>
                     </div>
-                    행사 이름
+                    {t('rfp_create_page.event_name_label')}
                   </Label>
                   <Input
                     id="title"
                     value={rfpTitle}
                     onChange={(e) => setRfpTitle(e.target.value)}
-                    placeholder="예: 2024 회사 송년회, AI 컨퍼런스, 제품 론칭 이벤트..."
+                    placeholder={t('rfp_create_page.event_name_placeholder')}
                     className="h-16 text-lg border-purple-200 focus:border-purple-400 focus:ring-purple-400/20 bg-white/80 shadow-md"
                   />
                 </div>
@@ -360,9 +360,9 @@ export default function CreateRfpPage() {
                   <div className="space-y-3 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200/50 hover:shadow-lg transition-all duration-300">
                     <Label htmlFor="date" className="flex items-center text-gray-800 font-semibold">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl mr-3 flex items-center justify-center">
-                        <CalendarIcon className="w-4 h-4 text-white" />
+                        <CalendarIcon className="w-4 h-4 text-white" aria-hidden="true" />
                       </div>
-                      언제쯤 개최하나요?
+                      {t('rfp_create_page.event_date_label')}
                     </Label>
                     <Input
                       id="date"
@@ -376,16 +376,16 @@ export default function CreateRfpPage() {
                   <div className="space-y-3 bg-gradient-to-br from-emerald-50 to-green-50 p-6 rounded-2xl border border-emerald-200/50 hover:shadow-lg transition-all duration-300">
                     <Label htmlFor="attendees" className="flex items-center text-gray-800 font-semibold">
                       <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl mr-3 flex items-center justify-center">
-                        <UsersIcon className="w-4 h-4 text-white" />
+                        <UsersIcon className="w-4 h-4 text-white" aria-hidden="true" />
                       </div>
-                      예상 참석자 수
+                      {t('rfp_create_page.expected_attendees_label')}
                     </Label>
                     <Input
                       id="attendees"
                       type="number"
                       value={expectedAttendees}
                       onChange={(e) => setExpectedAttendees(e.target.value)}
-                      placeholder="예: 100"
+                      placeholder={t('rfp_create_page.expected_attendees_placeholder')}
                       className="h-14 border-emerald-200 focus:border-emerald-400 focus:ring-emerald-400/20 bg-white/80 shadow-md"
                     />
                   </div>
@@ -393,16 +393,16 @@ export default function CreateRfpPage() {
                   <div className="space-y-3 bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200/50 hover:shadow-lg transition-all duration-300">
                     <Label className="flex items-center text-gray-800 font-semibold">
                       <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl mr-3 flex items-center justify-center">
-                        <DollarSignIcon className="w-4 h-4 text-white" />
+                        <DollarSignIcon className="w-4 h-4 text-white" aria-hidden="true" />
                       </div>
-                      총 예산
+                      {t('rfp_create_page.total_budget_label')}
                     </Label>
                     <div className="space-y-3">
                       <Input
                         type="number"
                         value={totalBudget}
                         onChange={(e) => setTotalBudget(e.target.value)}
-                        placeholder="예: 5000000"
+                        placeholder={t('rfp_create_page.total_budget_placeholder')}
                         disabled={isTotalBudgetUndecided}
                         className="h-14 border-amber-200 focus:border-amber-400 focus:ring-amber-400/20 bg-white/80 shadow-md disabled:bg-gray-100"
                       />
@@ -417,7 +417,7 @@ export default function CreateRfpPage() {
                           className="border-amber-300 data-[state=checked]:bg-amber-500"
                         />
                         <Label htmlFor="budget-undecided" className="text-sm text-gray-600 font-medium">
-                          아직 미정이에요
+                          {t('rfp_create_page.total_budget_undecided')}
                         </Label>
                       </div>
                     </div>
@@ -427,15 +427,15 @@ export default function CreateRfpPage() {
                 {/* 설명 */}
                 <div className="space-y-4 bg-gradient-to-r from-slate-50 to-gray-50 p-6 rounded-2xl border border-gray-200/50">
                   <Label htmlFor="description" className="text-lg font-semibold text-gray-800 flex items-center">
-                    <span className="text-2xl mr-3">✨</span>
-                    어떤 분위기의 행사인가요? 
-                    <span className="text-sm font-normal text-gray-500 ml-2">(선택)</span>
+                    <span className="text-2xl mr-3" role="img" aria-label="반짝이는 별 아이콘">✨</span>
+                    {t('rfp_create_page.description_label')}
+                    <span className="text-sm font-normal text-gray-500 ml-2">{t('rfp_create_page.description_optional')}</span>
                   </Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="예: 격식있는 비즈니스 미팅, 캐주얼한 팀 빌딩, 화려한 론칭 이벤트..."
+                    placeholder={t('rfp_create_page.description_placeholder')}
                     rows={4}
                     className="resize-none border-gray-200 focus:border-gray-400 focus:ring-gray-400/20 bg-white/80 shadow-md text-base"
                   />
@@ -447,11 +447,11 @@ export default function CreateRfpPage() {
                     disabled={!canProceedFromConcept}
                     className="group px-10 py-4 text-xl font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-600 hover:from-purple-600 hover:via-pink-600 hover:to-indigo-700 shadow-2xl shadow-purple-500/25 hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 rounded-2xl"
                   >
-                    다음: 구성 요소 선택하기
-                    <ArrowRightIcon className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
+                    {t('rfp_create_page.next_select_components_button')}
+                    <ArrowRightIcon className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
                   </Button>
                   {!canProceedFromConcept && (
-                    <p className="text-sm text-gray-500 mt-3">행사 이름을 입력해주세요</p>
+                    <p className="text-sm text-gray-500 mt-3">{t('rfp_create_page.enter_event_name_alert')}</p>
                   )}
                 </div>
               </CardContent>
@@ -463,13 +463,13 @@ export default function CreateRfpPage() {
             <>
               {/* 실시간 미리보기 */}
               <Card className="border-0 shadow-2xl bg-gradient-to-r from-white via-blue-50/50 to-indigo-50/50 backdrop-blur-md overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5" aria-hidden="true"></div>
                 <CardContent className="p-8 relative">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center mb-3">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-                        <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">실시간 미리보기</span>
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse" aria-hidden="true"></div>
+                        <span className="text-sm font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">{t('rfp_create_page.live_preview_title')}</span>
                       </div>
                       <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
                         {rfpTitle}
@@ -477,7 +477,7 @@ export default function CreateRfpPage() {
                       <div className="flex items-center flex-wrap gap-4 text-sm">
                         {eventDate && (
                           <div className="flex items-center bg-blue-100 px-3 py-2 rounded-xl">
-                            <CalendarIcon className="w-4 h-4 mr-2 text-blue-600" />
+                            <CalendarIcon className="w-4 h-4 mr-2 text-blue-600" aria-hidden="true" />
                             <span className="font-medium text-blue-700">
                               {new Date(eventDate).toLocaleDateString('ko-KR')}
                             </span>
@@ -485,13 +485,13 @@ export default function CreateRfpPage() {
                         )}
                         {expectedAttendees && (
                           <div className="flex items-center bg-emerald-100 px-3 py-2 rounded-xl">
-                            <UsersIcon className="w-4 h-4 mr-2 text-emerald-600" />
-                            <span className="font-medium text-emerald-700">{expectedAttendees}명</span>
+                            <UsersIcon className="w-4 h-4 mr-2 text-emerald-600" aria-hidden="true" />
+                            <span className="font-medium text-emerald-700">{expectedAttendees}{t('rfp_create_page.attendees_unit')}</span>
                           </div>
                         )}
                         <div className="flex items-center bg-purple-100 px-3 py-2 rounded-xl">
-                          <CheckIcon className="w-4 h-4 mr-2 text-purple-600" />
-                          <span className="font-medium text-purple-700">{selectedFeatures.length}개 구성요소</span>
+                          <CheckIcon className="w-4 h-4 mr-2 text-purple-600" aria-hidden="true" />
+                          <span className="font-medium text-purple-700">{selectedFeatures.length}{t('rfp_create_page.components_unit')}</span>
                         </div>
                       </div>
                     </div>
@@ -502,8 +502,8 @@ export default function CreateRfpPage() {
                         onClick={() => setCurrentStep('concept')}
                         className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
                       >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        기본정보 수정
+                        <Edit3 className="w-4 h-4 mr-2" aria-hidden="true" />
+                        {t('rfp_create_page.edit_basic_info_button')}
                       </Button>
                       {selectedFeatures.length > 0 && (
                         <Button
@@ -511,8 +511,8 @@ export default function CreateRfpPage() {
                           onClick={() => setCurrentStep('review')}
                           className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transform hover:scale-105 transition-all duration-300"
                         >
-                          <Eye className="w-4 h-4 mr-2" />
-                          미리보기
+                          <Eye className="w-4 h-4 mr-2" aria-hidden="true" />
+                          {t('rfp_create_page.preview_button')}
                         </Button>
                       )}
                     </div>
@@ -522,31 +522,31 @@ export default function CreateRfpPage() {
 
               {/* 검색 및 필터 */}
               <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-pink-500/5" aria-hidden="true"></div>
                 <CardContent className="p-8 relative">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center">
                       <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl mr-4 flex items-center justify-center">
-                        <span className="text-white text-xl">🔧</span>
+                        <span className="text-white text-xl" role="img" aria-label="도구 아이콘">🔧</span>
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-800">필요한 구성 요소를 선택해주세요</h3>
-                        <p className="text-sm text-gray-600">원하는 기능을 찾아 클릭해보세요</p>
+                        <h3 className="text-xl font-bold text-gray-800">{t('rfp_create_page.select_components_title')}</h3>
+                        <p className="text-sm text-gray-600">{t('rfp_create_page.select_components_description')}</p>
                       </div>
                     </div>
                     {selectedFeatures.length > 0 && (
                       <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 text-base font-semibold shadow-lg">
-                        {selectedFeatures.length}개 선택됨
+                        {selectedFeatures.length}{t('rfp_create_page.selected_count_prefix')}
                       </Badge>
                     )}
                   </div>
                   
                   <div className="relative">
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-500">
-                      <SearchIcon className="w-5 h-5" />
+                      <SearchIcon className="w-5 h-5" aria-hidden="true" />
                     </div>
                     <Input
-                      placeholder="원하는 기능을 검색해보세요... (예: 음향, 조명, 케이터링)"
+                      placeholder={t('rfp_create_page.search_components_placeholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-12 h-14 text-base border-indigo-200 focus:border-indigo-400 focus:ring-indigo-400/20 bg-white/80 shadow-md rounded-xl"
@@ -571,7 +571,7 @@ export default function CreateRfpPage() {
 
               {/* 하단 네비게이션 */}
               <Card className="border-0 shadow-2xl bg-gradient-to-r from-white via-gray-50 to-white backdrop-blur-md overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 via-slate-500/5 to-gray-500/5"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-500/5 via-slate-500/5 to-gray-500/5" aria-hidden="true"></div>
                 <CardContent className="p-8 relative">
                   <div className="flex items-center justify-between">
                     <Button
@@ -579,18 +579,18 @@ export default function CreateRfpPage() {
                       onClick={() => setCurrentStep('concept')}
                       className="border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 px-6 py-3 text-base transition-all duration-300"
                     >
-                      ← 이전: 기본 정보
+                      {t('rfp_create_page.previous_basic_info_button')}
                     </Button>
                     
                     <div className="text-center bg-gradient-to-r from-gray-50 to-slate-50 px-6 py-3 rounded-2xl border border-gray-200">
                       <p className="text-base font-semibold text-gray-700">
-                        {selectedFeatures.length > 0 
+                        {selectedFeatures.length > 0
                           ? (
                             <>
-                              <span className="text-indigo-600">{selectedFeatures.length}개</span> 구성요소가 선택되었습니다
+                              <span className="text-indigo-600">{selectedFeatures.length}개</span> {t('rfp_create_page.components_unit')}
                             </>
                           )
-                          : '최소 1개 이상의 구성요소를 선택해주세요'
+                          : t('rfp_create_page.min_one_component_alert')
                         }
                       </p>
                       {selectedFeatures.length > 0 && (
@@ -603,8 +603,8 @@ export default function CreateRfpPage() {
                       disabled={!canProceedFromBuild}
                       className="group bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transform hover:scale-105 transition-all duration-300 px-8 py-3 text-base font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
-                      다음: 최종 검토
-                      <ArrowRightIcon className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      {t('rfp_create_page.next_final_review_button')}
+                      <ArrowRightIcon className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
                     </Button>
                   </div>
                 </CardContent>
@@ -615,19 +615,19 @@ export default function CreateRfpPage() {
           {/* 3단계: 검토 및 완성 */}
           {currentStep === 'review' && (
             <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-cyan-500/10 to-blue-500/10" aria-hidden="true"></div>
               <CardHeader className="text-center relative z-10 pb-8">
                 <div className="relative inline-block mb-6">
                   <div className="w-28 h-28 bg-gradient-to-br from-emerald-500 via-cyan-500 to-blue-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-emerald-500/25 transform hover:scale-105 transition-all duration-300">
-                    <span className="text-white text-5xl">🎯</span>
+                    <span className="text-white text-5xl" role="img" aria-label="목표 아이콘">🎯</span>
                   </div>
-                  <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 rounded-3xl opacity-20 blur-xl animate-pulse"></div>
+                  <div className="absolute -inset-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 rounded-3xl opacity-20 blur-xl animate-pulse" aria-hidden="true"></div>
                 </div>
                 <CardTitle className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
-                  거의 완성되었습니다!
+                  {t('rfp_create_page.almost_done_title')}
                 </CardTitle>
                 <CardDescription className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  마지막으로 <span className="font-semibold text-emerald-600">세부 사항을 확인</span>하고 RFP를 완성해주세요.
+                  {t('rfp_create_page.almost_done_description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -636,22 +636,22 @@ export default function CreateRfpPage() {
                   <h3 className="font-bold text-lg mb-4">{rfpTitle}</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600">날짜</span>
-                      <p className="font-medium">{eventDate || '미정'}</p>
+                      <span className="text-gray-600">{t('rfp_create_page.summary_date_label')}</span>
+                      <p className="font-medium">{eventDate || t('rfp_create_page.summary_undecided')}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">참석자</span>
-                      <p className="font-medium">{expectedAttendees || '미정'}명</p>
+                      <span className="text-gray-600">{t('rfp_create_page.summary_attendees_label')}</span>
+                      <p className="font-medium">{expectedAttendees ? `${expectedAttendees}${t('rfp_create_page.attendees_unit')}` : t('rfp_create_page.summary_undecided')}</p>
                     </div>
                     <div>
-                      <span className="text-gray-600">예산</span>
+                      <span className="text-gray-600">{t('rfp_create_page.summary_budget_label')}</span>
                       <p className="font-medium">
-                        {isTotalBudgetUndecided ? '미정' : totalBudget ? `${parseInt(totalBudget).toLocaleString()}원` : '미정'}
+                        {isTotalBudgetUndecided ? t('rfp_create_page.summary_undecided') : totalBudget ? `${parseInt(totalBudget).toLocaleString()}원` : t('rfp_create_page.summary_undecided')}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-600">구성요소</span>
-                      <p className="font-medium">{selectedFeatures.length}개</p>
+                      <span className="text-gray-600">{t('rfp_create_page.summary_components_label')}</span>
+                      <p className="font-medium">{selectedFeatures.length}{t('rfp_create_page.components_unit')}</p>
                     </div>
                   </div>
                 </div>
@@ -659,13 +659,13 @@ export default function CreateRfpPage() {
                                  {/* 선택된 기능들의 상세 설정 */}
                  {selectedFeatureObjects.length > 0 && (
                    <div className="space-y-4">
-                     <h4 className="font-semibold text-lg">구성 요소별 상세 설정</h4>
+                     <h4 className="font-semibold text-lg">{t('rfp_create_page.components_detailed_settings_title')}</h4>
                      <div className="space-y-4">
                        {selectedFeatureObjects.map((feature) => (
                          <Card key={feature.id} className="border border-gray-200">
                            <CardHeader className="bg-gray-50">
                              <div className="flex items-center space-x-3">
-                               <span className="text-2xl">{feature.icon}</span>
+                               <span className="text-2xl" role="img" aria-label={`${feature.name} 아이콘`}>{feature.icon}</span>
                                <div>
                                  <CardTitle className="text-lg">{feature.name}</CardTitle>
                                  {feature.description && (
@@ -697,7 +697,7 @@ export default function CreateRfpPage() {
                     onClick={() => setCurrentStep('build')}
                     className="border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 px-6 py-3 text-base transition-all duration-300"
                   >
-                    ← 이전: 구성 수정
+                    {t('rfp_create_page.previous_edit_components_button')}
                   </Button>
                   
                   <div className="text-center">
@@ -707,18 +707,18 @@ export default function CreateRfpPage() {
                       className="group px-12 py-4 text-xl font-bold bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 hover:from-emerald-600 hover:via-cyan-600 hover:to-blue-600 shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transform hover:scale-105 transition-all duration-300 rounded-2xl disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       {saving ? (
-                        <>
+                        <span role="status" aria-live="polite" className="flex items-center justify-center">
                           <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                          저장하는 중...
-                        </>
+                          {t('rfp_create_page.saving_in_progress')}
+                        </span>
                       ) : (
                         <>
-                          <Save className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" />
-                          🎉 RFP 완성하기
+                          <Save className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" aria-hidden="true" />
+                          {t('rfp_create_page.complete_rfp_button')}
                         </>
                       )}
                     </Button>
-                    <p className="text-sm text-gray-500 mt-3">완성된 RFP는 대시보드에서 확인할 수 있습니다</p>
+                    <p className="text-sm text-gray-500 mt-3">{t('rfp_create_page.view_on_dashboard_hint')}</p>
                   </div>
                   
                   <div></div> {/* 공간 균형을 위한 빈 div */}
@@ -739,7 +739,7 @@ export default function CreateRfpPage() {
 
         {/* 에러 표시 */}
         {error && (
-          <Card className="border-red-200 bg-red-50">
+          <Card role="alert" aria-live="assertive" className="border-red-200 bg-red-50">
             <CardContent className="p-4">
               <p className="text-red-700">{error}</p>
             </CardContent>

@@ -59,7 +59,9 @@ export function getTranslation(lang: Language, key: string, params?: Record<stri
 
 export function useTranslation() {
   const { currentLanguage } = useLanguageStore();
-  return useCallback((key: string, params?: Record<string, string | number>): string => {
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
     return getTranslation(currentLanguage, key, params);
   }, [currentLanguage]);
+
+  return { t, currentLanguage };
 }

@@ -161,7 +161,7 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <Link href="/dashboard" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
-            <ChevronLeftIcon className="w-5 h-5 mr-2" />
+            <ChevronLeftIcon className="w-5 h-5 mr-2" aria-hidden="true" />
             {t('rfp_detail.back_to_dashboard')}
           </Link>
         </div>
@@ -179,16 +179,16 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
             <div className="flex-shrink-0 flex items-center gap-2">
               <Link href={`/rfp/${rfp.id}/edit`}>
                 <Button variant="outline" className="inline-flex items-center">
-                  <PencilIcon className="w-4 h-4 mr-2" />
+                  <PencilIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                   {t('common.edit')}
                 </Button>
               </Link>
               <Button variant="outline" className="inline-flex items-center">
-                <ShareIcon className="w-4 h-4 mr-2" />
+                <ShareIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                 {t('common.share')}
               </Button>
               <Button className="inline-flex items-center">
-                <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+                <ArrowDownTrayIcon className="w-4 h-4 mr-2" aria-hidden="true" />
                 {t('common.export_pdf')}
               </Button>
             </div>
@@ -199,8 +199,8 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
           <CardContent className="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
             <InfoItem icon={CalendarIcon} label={t('rfp_detail.event_date_label')} value={formatDate(rfp.event_date, t)} />
             <InfoItem icon={ClipboardIcon} label={t('rfp_detail.selected_items_label')} value={`${rfp.selections?.length || 0}${t('rfp_detail.items_suffix')}`} />
-            <InfoItem icon={CurrencyDollarIcon} label="총 예산" value="₩12,000,000" />
-            <InfoItem icon={CheckCircleIcon} label="마지막 업데이트" value={formatDate(rfp.updated_at, t)} />
+            <InfoItem icon={CurrencyDollarIcon} label={t('rfp_detail_page.total_budget_label')} value={t('rfp_detail_page.total_budget_value')} />
+            <InfoItem icon={CheckCircleIcon} label={t('dashboard.last_updated_prefix')} value={formatDate(rfp.updated_at, t)} />
           </CardContent>
         </Card>
         
@@ -218,7 +218,7 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
                       <ul className="mt-2 space-y-1 pl-1">
                         {formatDetails(selection.details, selection.featureConfigFields, t).map((detail, i) => (
                            <li key={i} className="text-sm text-gray-500 flex items-start">
-                             <span className="w-1 h-1 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                             <span className="w-1 h-1 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0" aria-hidden="true"></span>
                              {detail}
                            </li>
                         ))}
@@ -234,7 +234,7 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
         {Object.keys(categorizedSelections).length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
-              <ClipboardIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <ClipboardIcon className="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
               <h3 className="mt-2 text-sm font-medium text-gray-900">{t('rfp_detail.no_selected_items_title')}</h3>
               <p className="mt-1 text-sm text-gray-500">{t('rfp_detail.no_selected_items_description')}</p>
               <div className="mt-6">
@@ -252,7 +252,7 @@ export default async function RfpDetailPage({ params }: RfpDetailPageProps) {
 
 const InfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) => (
   <div className="flex items-start">
-    <Icon className="w-6 h-6 text-gray-400 mr-3 mt-1 flex-shrink-0" />
+    <Icon className="w-6 h-6 text-gray-400 mr-3 mt-1 flex-shrink-0" aria-hidden="true" />
     <div>
       <dt className="text-sm font-medium text-gray-500">{label}</dt>
       <dd className="mt-1 text-lg font-semibold text-gray-900">{value}</dd>

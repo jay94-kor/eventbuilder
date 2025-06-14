@@ -16,7 +16,7 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ user, onCancel }: ProfileFormProps) {
   const { updateUser, isLoading, error, clearError } = useAuth();
-  const t = useTranslation();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: user.name,
     email: user.email,

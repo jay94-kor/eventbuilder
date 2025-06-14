@@ -19,7 +19,7 @@ interface Rfp {
 }
 
 export default function RfpListPage() {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const { token } = useAuth(); // useAuth 훅에서 token 가져오기
   const [rfps, setRfps] = useState<Rfp[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +52,7 @@ export default function RfpListPage() {
         const data = await response.json();
         setRfps(data.data);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'RFP 목록을 불러오지 못했습니다.';
+        const errorMessage = err instanceof Error ? err.message : t('rfp_list_page.fetch_error');
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -60,11 +60,11 @@ export default function RfpListPage() {
     };
 
     fetchRfps();
-  }, []);
+  }, [t]); // t를 의존성 배열에 추가
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div role="status" aria-live="polite" className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6">{t('rfp_list.title')}</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(3)].map((_, i) => (

@@ -15,14 +15,14 @@ interface RfpCardProps {
     status: 'draft' | 'completed' | 'archived';
   };
 }
-
+ 
 export default function RfpCard({ rfp }: RfpCardProps) {
-  const t = useTranslation();
-
+  const { t } = useTranslation();
+ 
   const formattedEventDate = rfp.event_date
-    ? format(new Date(rfp.event_date), 'yyyy.MM.dd')
+    ? format(new Date(rfp.event_date), t('common.date_format'))
     : t('common.date_undetermined');
-  const formattedCreatedAt = format(new Date(rfp.created_at), 'yyyy.MM.dd');
+  const formattedCreatedAt = format(new Date(rfp.created_at), t('common.date_format'));
 
   const getStatusText = (status: string) => {
     switch (status) {

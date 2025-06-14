@@ -38,7 +38,7 @@
 - [x] `event-builder-web/src/app/(main)/rfp/create/page.tsx` 번역 적용.
 - [x] `event-builder-web/src/components/rfp/CategorySection.tsx` 번역 적용.
 - [x] `event-builder-web/src/components/rfp/FeatureCard.tsx` 번역 적용.
-- [ ] 그 외 하드코딩된 텍스트가 있는 모든 프론트엔드 파일 식별 및 번역 적용.ㅇ
+- \[x\] 그 외 하드코딩된 텍스트가 있는 모든 프론트엔드 파일 식별 및 번역 적용.ㅇ
 - [x] `event-builder-web/src/app/layout.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
@@ -63,64 +63,66 @@
 - [x] `event-builder-web/src/components/common/Button.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/common/ErrorBoundary.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/common/ErrorBoundary.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/common/Input.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/ui/input.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/DashboardDemo.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/DashboardDemo.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/MonthlyChart.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/MonthlyChart.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/MonthlyRfpChart.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/MonthlyRfpChart.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/OnboardingRfpCard.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/OnboardingRfpCard.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/OnboardingWelcome.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/OnboardingWelcome.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/StartRfpButton.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/StartRfpButton.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/StatsCard.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/StatsCard.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/dashboard/TopFeaturesChart.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/dashboard/TopFeaturesChart.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/features/FeatureCard.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/features/FeatureCard.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/features/FeatureCategorySection.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/features/FeatureCategorySection.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/layout/Footer.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/layout/Footer.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/profile/ProfileForm.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/profile/ProfileForm.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/providers/ClientProvider.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/providers/ClientProvider.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/rfp/DynamicFeatureForm.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/rfp/DynamicFeatureForm.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/rfp/RecommendationAlert.tsx` 번역 적용.
+- \[x\] `event-builder-web/src/components/rfp/RecommendationAlert.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
-- [ ] `event-builder-web/src/components/ui/Toast.tsx` 번역 적용.
+- [x] `event-builder-web/src/components/ui/toast.tsx` 번역 적용.
     - `useTranslation()` 훅 임포트 및 사용.
     - 모든 하드코딩된 텍스트를 `t('key.path.to.text')` 형태로 교체.
 
 ## 4. 테스트 및 검증
 
-- [ ] 개발 서버 실행 후 모든 번역된 페이지 및 컴포넌트 확인.
-- [ ] 언어 변경 기능 테스트.
-- [ ] 폼 유효성 검사 메시지 등 동적 텍스트 번역 확인.
-- [ ] 누락된 번역 키 또는 오역 검토.
+i18n으로 변경한다음에 각각의 언어(4개의 언어가있음)에다가도 들어가야 하는 내용들을 추가해서 missing text 오류가 없도록 해줘.
+
+- \[x\] 개발 서버 실행 후 모든 번역된 페이지 및 컴포넌트 확인.
+- \[x\] 언어 변경 기능 테스트.
+- \[x\] 폼 유효성 검사 메시지 등 동적 텍스트 번역 확인.
+- \[x\] 누락된 번역 키 또는 오역 검토.

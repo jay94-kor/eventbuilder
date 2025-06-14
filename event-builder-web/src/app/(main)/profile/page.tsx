@@ -11,7 +11,7 @@ export default function ProfilePage() {
   const { user, isLoading, error, getUser, isAuthenticated, isInitialLoading } = useAuth(); // isInitialLoading 추가
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
-  const t = useTranslation(); // useTranslation 훅 사용
+  const { t } = useTranslation(); // useTranslation 훅 사용
 
   useEffect(() => {
     // 토큰은 있지만 user 정보가 아직 로드되지 않은 경우 getUser 호출
@@ -26,16 +26,16 @@ export default function ProfilePage() {
 
   if (isLoading || isInitialLoading || !isAuthenticated) { // 초기 로딩 및 인증 상태 추가
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div role="status" aria-live="polite" className="flex justify-center items-center min-h-screen bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <span className="ml-4 text-muted-foreground">{t('common.loading')}</span>
+        <span className="ml-4 text-muted-foreground">{t('profile_page.loading_user_info_message')}</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto p-8 bg-card shadow-md rounded-lg mt-8">
+      <div role="alert" aria-live="assertive" className="max-w-4xl mx-auto p-8 bg-card shadow-md rounded-lg mt-8">
         <h1 className="text-2xl font-bold text-red-600 mb-4">{t('common.error_occurred')}</h1>
         <p className="text-muted-foreground">{t('profile.fetch_user_info_failed')}{error}</p>
         <button
@@ -50,9 +50,20 @@ export default function ProfilePage() {
 
   // user 객체가 없으면 (위에서 isLoading, error 처리 후) 로그인 페이지로 리다이렉트
   if (!user) {
-    // 이 경우는 사실상 위의 !isAuthenticated 조건에서 처리되지만, 혹시 모를 상황 대비
-    router.push('/login');
-    return null; // 리다이렉트 중에는 아무것도 렌더링하지 않음
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
+          <h2 className="text-xl font-semibold mb-4">{t('profile_page.login_required_title')}</h2>
+          <p className="text-muted-foreground mb-4">{t('profile_page.login_required_description')}</p>
+          <button
+            onClick={() => router.push('/login')}
+            className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 ease-out hover:bg-primary/90 hover:shadow-brand"
+          >
+            {t('profile_page.login_button')}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -62,15 +73,15 @@ export default function ProfilePage() {
       {!isEditing ? (
         <div className="space-y-4">
           <div className="flex items-center">
-            <label className="w-24 text-label">{t('profile.name_label')}</label>
+            <span className="w-24 text-label">{t('profile.name_label')}</span>
             <span className="text-foreground text-lg">{user.name}</span>
           </div>
           <div className="flex items-center">
-            <label className="w-24 text-label">{t('profile.email_label')}</label>
+            <span className="w-24 text-label">{t('profile.email_label')}</span>
             <span className="text-foreground text-lg">{user.email}</span>
           </div>
           <div className="flex items-center">
-            <label className="w-24 text-label">{t('profile.joined_date_label')}</label>
+            <span className="w-24 text-label">{t('profile.joined_date_label')}</span>
             <span className="text-foreground text-lg">
               {new Date(user.created_at).toLocaleDateString('ko-KR')}
             </span>

@@ -16,7 +16,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { user, setOnboarded, setSkipOnboarding, isLoading } = useAuthStore();
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const t = useTranslation(); // useTranslation 훅 사용
+  const { t } = useTranslation(); // useTranslation 훅 사용
  
    useEffect(() => {
      // 사용자가 이미 온보딩되었거나 온보딩을 건너뛰기로 설정했다면 대시보드로 리다이렉트
@@ -82,11 +82,11 @@ export default function OnboardingPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
+        <div role="status" aria-live="polite" className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
           <div className="w-12 h-12 mx-auto mb-4 bg-brand-light rounded-full flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-brand font-medium">사용자 정보를 불러오는 중...</p>
+          <p className="text-brand font-medium">{t('onboarding_page.loading_user_info')}</p>
         </div>
       </div>
     );
@@ -96,11 +96,11 @@ export default function OnboardingPage() {
   if (isRedirecting) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
+        <div role="status" aria-live="polite" className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
           <div className="w-12 h-12 mx-auto mb-4 bg-brand-light rounded-full flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p className="text-brand font-medium">대시보드로 이동 중...</p>
+          <p className="text-brand font-medium">{t('onboarding_page.redirecting_to_dashboard')}</p>
         </div>
       </div>
     );
@@ -111,13 +111,13 @@ export default function OnboardingPage() {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="bg-card/95 backdrop-blur-md border border/70 shadow-md p-8 rounded-xl max-w-md mx-auto">
-          <h2 className="text-xl font-semibold mb-4">로그인이 필요합니다</h2>
-          <p className="text-muted-foreground mb-4">온보딩을 진행하려면 먼저 로그인해주세요.</p>
+          <h2 className="text-xl font-semibold mb-4">{t('onboarding_page.login_required_title')}</h2>
+          <p className="text-muted-foreground mb-4">{t('onboarding_page.login_required_description')}</p>
           <button
             onClick={() => router.push('/login')}
             className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 ease-out hover:bg-primary/90 hover:shadow-brand"
           >
-            로그인하기
+            {t('onboarding_page.login_button')}
           </button>
         </div>
       </div>
@@ -126,28 +126,28 @@ export default function OnboardingPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <OnboardingWelcome userName={user?.name || '새로운 사용자'} />
+      <OnboardingWelcome userName={user?.name || t('common.new_user')} />
 
       <section className="my-8">
-        <h2 className="text-2xl font-bold text-foreground mb-4">서비스의 주요 기능 및 이점</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">{t('onboarding_page.main_features_title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-card p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">간편한 RFP 생성</h3>
-            <p className="text-muted-foreground">몇 단계만으로 필요한 기능을 선택하고 RFP를 생성할 수 있습니다.</p>
+            <h3 className="text-xl font-semibold mb-2">{t('onboarding_page.easy_rfp_creation_title')}</h3>
+            <p className="text-muted-foreground">{t('onboarding_page.easy_rfp_creation_description')}</p>
           </div>
           <div className="bg-card p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">맞춤형 기능 추천</h3>
-            <p className="text-muted-foreground">선택한 기능에 따라 최적의 추가 기능을 추천받으세요.</p>
+            <h3 className="text-xl font-semibold mb-2">{t('onboarding_page.custom_feature_recommendation_title')}</h3>
+            <p className="text-muted-foreground">{t('onboarding_page.custom_feature_recommendation_description')}</p>
           </div>
           <div className="bg-card p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">예산 관리 및 통계</h3>
-            <p className="text-muted-foreground">예산을 효율적으로 관리하고, RFP 통계를 한눈에 확인하세요.</p>
+            <h3 className="text-xl font-semibold mb-2">{t('onboarding_page.budget_management_and_statistics_title')}</h3>
+            <p className="text-muted-foreground">{t('onboarding_page.budget_management_and_statistics_description')}</p>
           </div>
         </div>
       </section>
 
       <section className="my-8">
-        <h2 className="text-2xl font-bold text-foreground mb-4">예시 RFP 목록</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">{t('onboarding_page.example_rfp_list_title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {onboardingRfpData.map((rfp, index) => (
             <OnboardingRfpCard key={index} rfp={rfp} />
@@ -156,7 +156,7 @@ export default function OnboardingPage() {
       </section>
 
       <section className="my-8 text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-4">지금 바로 시작하세요!</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">{t('onboarding_page.start_now_title')}</h2>
         <StartRfpButton onClick={handleStartRfp} />
         <div className="mt-4 flex items-center justify-center space-x-2">
           <Checkbox
@@ -168,7 +168,7 @@ export default function OnboardingPage() {
             htmlFor="skip-onboarding"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            다음에 다시 보지 않기
+            {t('onboarding_page.do_not_show_again')}
           </label>
         </div>
       </section>
@@ -176,11 +176,11 @@ export default function OnboardingPage() {
       {/* 디버깅 정보 (개발 환경에서만 표시) */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm">
-          <h3 className="font-semibold mb-2">디버깅 정보:</h3>
-          <p>사용자 ID: {user?.id}</p>
-          <p>사용자 이름: {user?.name}</p>
-          <p>온보딩 완료: {user?.onboarded ? '예' : '아니오'}</p>
-          <p>온보딩 건너뛰기: {user?.skip_onboarding ? '예' : '아니오'}</p>
+          <h3 className="font-semibold mb-2">{t('onboarding_page.debugging_info_title')}</h3>
+          <p>{t('onboarding_page.user_id')} {user?.id}</p>
+          <p>{t('onboarding_page.user_name')} {user?.name}</p>
+          <p>{t('onboarding_page.onboarding_completed')} {user?.onboarded ? t('onboarding_page.yes') : t('onboarding_page.no')}</p>
+          <p>{t('onboarding_page.onboarding_skipped')} {user?.skip_onboarding ? t('onboarding_page.yes') : t('onboarding_page.no')}</p>
         </div>
       )}
     </div>

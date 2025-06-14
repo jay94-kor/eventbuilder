@@ -5,6 +5,7 @@ import { OnboardingRfp, statusColorMap, cardColorMap } from '@/lib/onboardingDat
 import { CalendarIcon, DocumentTextIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/design-system';
+import { useTranslation } from '@/lib/i18n';
 
 interface OnboardingRfpCardProps {
   rfp: OnboardingRfp;
@@ -12,9 +13,11 @@ interface OnboardingRfpCardProps {
 }
 
 const OnboardingRfpCard: React.FC<OnboardingRfpCardProps> = ({ rfp, delay = 0 }) => {
+  const { t } = useTranslation();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
+    return date.toLocaleDateString(t('locale'), {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -73,10 +76,10 @@ const OnboardingRfpCard: React.FC<OnboardingRfpCardProps> = ({ rfp, delay = 0 })
 
       <CardContent className="pt-0">
         {/* 진행률 표시 (진행중인 경우) */}
-        {rfp.status === '진행중' && (
+        {rfp.status === t('common.status.inProgress') && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-              <span>진행률</span>
+              <span>{t('rfpCard.progress')}</span>
               <span>75%</span>
             </div>
             <div className="w-full bg-muted rounded-full h-2">
@@ -99,13 +102,13 @@ const OnboardingRfpCard: React.FC<OnboardingRfpCardProps> = ({ rfp, delay = 0 })
         <div className="flex items-center text-xs text-muted-foreground">
           <ClockIcon className="h-4 w-4 mr-1" />
           {isUpcoming && (
-            <span className="text-green-600 font-medium">예정</span>
+            <span className="text-green-600 font-medium">{t('rfpCard.upcoming')}</span>
           )}
           {isPast && (
-            <span className="text-muted-foreground">완료</span>
+            <span className="text-muted-foreground">{t('rfpCard.completed')}</span>
           )}
           {!isUpcoming && !isPast && (
-            <span className="text-primary font-medium">오늘</span>
+            <span className="text-primary font-medium">{t('rfpCard.today')}</span>
           )}
         </div>
       </CardFooter>
@@ -117,8 +120,8 @@ const OnboardingRfpCard: React.FC<OnboardingRfpCardProps> = ({ rfp, delay = 0 })
       )}>
         <div className="text-white text-center">
           <DocumentTextIcon className="h-8 w-8 mx-auto mb-2" />
-          <p className="text-sm font-medium">미리보기</p>
-          <p className="text-xs opacity-80">클릭하여 자세히 보기</p>
+          <p className="text-sm font-medium">{t('rfpCard.preview')}</p>
+          <p className="text-xs opacity-80">{t('rfpCard.clickForDetails')}</p>
         </div>
       </div>
     </Card>

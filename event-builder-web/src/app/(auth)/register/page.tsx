@@ -27,29 +27,46 @@ export default function RegisterPage() {
   const router = useRouter()
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false)
-  const t = useTranslation(); // useTranslation 훅 사용
+  const { t } = useTranslation(); // useTranslation 훅 사용
 
   // URL에서 리다이렉트 경로 가져오기
   const redirectTo = searchParams.get('redirect');
 
-  // currentLanguage에 따라 Zod 스키마 동적 생성
+  // 번역된 메시지를 변수에 저장
+  const nameRequiredMessage = t('auth.register.name_required');
+  const nameTooLongMessage = t('auth.register.name_too_long');
+  const emailRequiredMessage = t('auth.register.email_required');
+  const emailInvalidMessage = t('auth.register.email_invalid');
+  const passwordMinLengthMessage = t('auth.register.password_min_length');
+  const passwordConfirmRequiredMessage = t('auth.register.password_confirm_required');
+  const passwordMismatchMessage = t('auth.register.password_mismatch');
+
+  // Zod 스키마 정의 (번역된 메시지 변수 사용)
   const memoizedRegisterSchema = React.useMemo(() => {
     return baseRegisterSchema.extend({
       name: baseRegisterSchema.shape.name
-        .min(1, t('auth.register.name_required'))
-        .max(255, t('auth.register.name_too_long')),
+        .min(1, nameRequiredMessage)
+        .max(255, nameTooLongMessage),
       email: baseRegisterSchema.shape.email
-        .min(1, t('auth.register.email_required'))
-        .email(t('auth.register.email_invalid')),
+        .min(1, emailRequiredMessage)
+        .email(emailInvalidMessage),
       password: baseRegisterSchema.shape.password
-        .min(8, t('auth.register.password_min_length')),
+        .min(8, passwordMinLengthMessage),
       password_confirmation: baseRegisterSchema.shape.password_confirmation
-        .min(1, t('auth.register.password_confirm_required'))
+        .min(1, passwordConfirmRequiredMessage)
     }).refine((data) => data.password === data.password_confirmation, {
-      message: t('auth.register.password_mismatch'),
+      message: passwordMismatchMessage,
       path: ["password_confirmation"]
     });
-  }, [t]);
+  }, [
+    nameRequiredMessage,
+    nameTooLongMessage,
+    emailRequiredMessage,
+    emailInvalidMessage,
+    passwordMinLengthMessage,
+    passwordConfirmRequiredMessage,
+    passwordMismatchMessage,
+  ]);
 
   const {
     register,
@@ -131,16 +148,18 @@ export default function RegisterPage() {
                 {...register('name')}
                 type="text"
                 id="name"
+                aria-invalid={errors.name ? "true" : undefined}
+                aria-describedby={errors.name ? "name-error" : undefined}
                 className={`h-12 border-2 transition-all duration-300 ${
-                  errors.name 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50' 
+                  errors.name
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50'
                     : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-gray-300'
                 }`}
                 placeholder={t('auth.register.name_placeholder')}
                 disabled={isLoading}
               />
               {errors.name && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p id="name-error" className="mt-2 text-sm text-red-600 flex items-center">
                   <span className="mr-1">⚠️</span>
                   {errors.name.message}
                 </p>
@@ -157,16 +176,18 @@ export default function RegisterPage() {
                 {...register('email')}
                 type="email"
                 id="email"
+                aria-invalid={errors.email ? "true" : undefined}
+                aria-describedby={errors.email ? "email-error" : undefined}
                 className={`h-12 border-2 transition-all duration-300 ${
-                  errors.email 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50' 
+                  errors.email
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50'
                     : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-gray-300'
                 }`}
                 placeholder={t('auth.register.email_placeholder')}
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p id="email-error" className="mt-2 text-sm text-red-600 flex items-center">
                   <span className="mr-1">⚠️</span>
                   {errors.email.message}
                 </p>
@@ -183,16 +204,18 @@ export default function RegisterPage() {
                 {...register('password')}
                 type="password"
                 id="password"
+                aria-invalid={errors.password ? "true" : undefined}
+                aria-describedby={errors.password ? "password-error" : undefined}
                 className={`h-12 border-2 transition-all duration-300 ${
-                  errors.password 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50' 
+                  errors.password
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50'
                     : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-gray-300'
                 }`}
                 placeholder={t('auth.register.password_placeholder')}
                 disabled={isLoading}
               />
               {errors.password && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p id="password-error" className="mt-2 text-sm text-red-600 flex items-center">
                   <span className="mr-1">⚠️</span>
                   {errors.password.message}
                 </p>
@@ -209,16 +232,18 @@ export default function RegisterPage() {
                 {...register('password_confirmation')}
                 type="password"
                 id="password_confirmation"
+                aria-invalid={errors.password_confirmation ? "true" : undefined}
+                aria-describedby={errors.password_confirmation ? "password-confirmation-error" : undefined}
                 className={`h-12 border-2 transition-all duration-300 ${
-                  errors.password_confirmation 
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50' 
+                  errors.password_confirmation
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 bg-red-50/50'
                     : 'border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 hover:border-gray-300'
                 }`}
                 placeholder={t('auth.register.confirm_password_placeholder')}
                 disabled={isLoading}
               />
               {errors.password_confirmation && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
+                <p id="password-confirmation-error" className="mt-2 text-sm text-red-600 flex items-center">
                   <span className="mr-1">⚠️</span>
                   {errors.password_confirmation.message}
                 </p>
@@ -233,13 +258,13 @@ export default function RegisterPage() {
                 className="w-full h-12 bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] focus:scale-[0.98] shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
-                  <>
+                  <span role="status" aria-live="polite" className="flex items-center justify-center">
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     {t('auth.register.registering')}
-                  </>
+                  </span>
                 ) : (
                   <>
                     <span className="mr-2">✨</span>

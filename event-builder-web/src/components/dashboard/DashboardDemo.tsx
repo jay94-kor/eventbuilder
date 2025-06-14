@@ -4,40 +4,42 @@ import React from 'react';
 import StatsCard from './StatsCard';
 import MonthlyRfpChart from './MonthlyRfpChart';
 import TopFeaturesChart from './TopFeaturesChart';
-
-// 테스트용 데이터
-const mockStats = {
-  totalRfps: 10,
-  completedRfps: 6,
-  monthlyRfpCounts: {
-    "2025-01": 2,
-    "2025-02": 2,
-    "2025-03": 2,
-    "2025-04": 2,
-    "2025-05": 0,
-    "2025-06": 0
-  },
-  topFeatures: [
-    { id: 1, name: "행사 일정", icon: "calendar", usage_count: 8 },
-    { id: 2, name: "음향 장비", icon: "speaker", usage_count: 4 },
-    { id: 5, name: "케이터링", icon: "utensils", usage_count: 3 },
-    { id: 3, name: "무대 시설", icon: "stage", usage_count: 3 },
-    { id: 4, name: "조명 설비", icon: "lightbulb", usage_count: 2 }
-  ]
-};
+import { useTranslation } from '@/lib/i18n';
 
 export default function DashboardDemo() {
+  const { t } = useTranslation();
+
+  // 테스트용 데이터
+  const mockStats = {
+    totalRfps: 10,
+    completedRfps: 6,
+    monthlyRfpCounts: {
+      "2025-01": 2,
+      "2025-02": 2,
+      "2025-03": 2,
+      "2025-04": 2,
+      "2025-05": 0,
+      "2025-06": 0
+    },
+    topFeatures: [
+      { id: 1, name: t('features.event_schedule'), icon: "calendar", usage_count: 8 },
+      { id: 2, name: t('features.audio_equipment'), icon: "speaker", usage_count: 4 },
+      { id: 5, name: t('features.catering_service'), icon: "utensils", usage_count: 3 },
+      { id: 3, name: t('features.stage_facilities'), icon: "stage", usage_count: 3 },
+      { id: 4, name: t('features.lighting_equipment'), icon: "lightbulb", usage_count: 2 }
+    ]
+  };
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-foreground mb-8">
-          대시보드 컴포넌트 데모
+          {t('dashboard.demoTitle')}
         </h1>
         
         {/* 통계 카드들 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatsCard
-            title="총 RFP 수"
+            title={t('dashboard.totalRfpsTitle')}
             value={mockStats.totalRfps}
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,11 +48,11 @@ export default function DashboardDemo() {
             }
             color="text-primary"
             bgColor="bg-primary/10"
-            description="전체 생성된 RFP"
+            description={t('dashboard.totalRfpsDescription')}
           />
           
           <StatsCard
-            title="완료된 RFP"
+            title={t('dashboard.completedRfpsTitle')}
             value={mockStats.completedRfps}
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,11 +61,11 @@ export default function DashboardDemo() {
             }
             color="text-green-600"
             bgColor="bg-green-50"
-            description="완료 상태의 RFP"
+            description={t('dashboard.completedRfpsDescription')}
           />
           
           <StatsCard
-            title="완료율"
+            title={t('dashboard.completionRateTitle')}
             value={`${Math.round((mockStats.completedRfps / mockStats.totalRfps) * 100)}%`}
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +78,7 @@ export default function DashboardDemo() {
           />
           
           <StatsCard
-            title="이번 달 생성"
+            title={t('dashboard.thisMonthCreatedTitle')}
             value={mockStats.monthlyRfpCounts["2025-06"] || 0}
             icon={
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +87,7 @@ export default function DashboardDemo() {
             }
             color="text-orange-600"
             bgColor="bg-orange-50"
-            description="6월 생성 RFP"
+            description={t('dashboard.thisMonthCreatedDescription')}
           />
         </div>
         

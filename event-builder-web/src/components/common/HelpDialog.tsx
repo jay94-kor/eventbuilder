@@ -13,7 +13,7 @@ interface HelpDialogProps {
 
 const HelpDialog: React.FC<HelpDialogProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   const helpContent = [
     {
@@ -98,7 +98,7 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ children }) => {
             onClick={() => setIsOpen(false)}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
           >
-            도움말 닫기
+            {t('help.close_button')}
           </Button>
         </div>
       </DialogContent>

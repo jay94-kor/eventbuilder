@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PlusCircleIcon, ArrowRightIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/design-system';
+import { useTranslation } from '@/lib/i18n';
 
 interface StartRfpButtonProps {
   className?: string;
@@ -17,6 +18,7 @@ const StartRfpButton: React.FC<StartRfpButtonProps> = ({
   size = 'lg',
   onClick
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="text-center py-8">
       <Link href="/rfp/create/basic-info">
@@ -50,7 +52,7 @@ const StartRfpButton: React.FC<StartRfpButtonProps> = ({
             </div>
             
             <span className="font-bold">
-              나의 첫 RFP 작성하러 가기
+              {t('dashboard.startRfpButton')}
             </span>
 
             <ArrowRightIcon className="h-6 w-6 ml-4 group-hover:translate-x-2 transition-transform duration-300" />
@@ -61,11 +63,11 @@ const StartRfpButton: React.FC<StartRfpButtonProps> = ({
       {/* 매력적인 부제목 */}
       <div className="mt-6 text-center">
         <p className="text-gray-600 text-lg mb-4 max-w-md mx-auto leading-relaxed">
-          🚀 <span className="font-semibold">몇 분 만에</span> 전문적인 행사 기획안을 완성하세요!
+          🚀 <span className="font-semibold">{t('dashboard.startRfpSubtitleHighlight')}</span> {t('dashboard.startRfpSubtitle')}
         </p>
         <p className="text-sm text-gray-500">
-          블록을 선택하고 내용을 입력하기만 하면 
-          <span className="font-medium text-blue-600"> AI가 맞춤 추천</span>까지!
+          {t('dashboard.startRfpDescriptionPart1')}
+          <span className="font-medium text-blue-600"> {t('dashboard.startRfpDescriptionHighlight')}</span>{t('dashboard.startRfpDescriptionPart2')}
         </p>
       </div>
 
@@ -75,21 +77,21 @@ const StartRfpButton: React.FC<StartRfpButtonProps> = ({
           <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full mx-auto mb-2 flex items-center justify-center">
             <span className="text-white text-sm font-bold">⚡</span>
           </div>
-          <div className="text-xs font-semibold text-green-700">5분 내 완성</div>
+          <div className="text-xs font-semibold text-green-700">{t('dashboard.featureCard1Title')}</div>
         </div>
         
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl text-center border border-blue-100 transform hover:scale-105 transition-transform duration-200">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto mb-2 flex items-center justify-center">
             <span className="text-white text-sm font-bold">📋</span>
           </div>
-          <div className="text-xs font-semibold text-blue-700">전문 템플릿</div>
+          <div className="text-xs font-semibold text-blue-700">{t('dashboard.featureCard2Title')}</div>
         </div>
         
         <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl text-center border border-purple-100 transform hover:scale-105 transition-transform duration-200">
           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mx-auto mb-2 flex items-center justify-center">
             <span className="text-white text-sm font-bold">🎯</span>
           </div>
-          <div className="text-xs font-semibold text-purple-700">맞춤 추천</div>
+          <div className="text-xs font-semibold text-purple-700">{t('dashboard.featureCard3Title')}</div>
         </div>
       </div>
     </div>

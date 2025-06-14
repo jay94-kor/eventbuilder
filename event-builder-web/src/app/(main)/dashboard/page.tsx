@@ -18,7 +18,7 @@ import { useTranslation } from '@/lib/i18n'; // useTranslation 훅 import
 export default function DashboardPage() {
   const router = useRouter(); // useRouter 훅 호출
   const { user, updateUser } = useAuth(); // setOnboarded 제거, getUser 제거
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   const [rfps, setRfps] = useState<Rfp[]>([]);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
@@ -217,16 +217,19 @@ export default function DashboardPage() {
         {/* 온보딩/대시보드 토글 버튼 */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-foreground">
-            {showOnboarding ? '온보딩' : '대시보드'}
+            {showOnboarding ? t('dashboard.onboarding_toggle_onboarding') : t('dashboard.onboarding_toggle_dashboard')}
           </h1>
           <div className="flex items-center gap-4">
             {/* 온보딩 토글 스위치 */}
             <div className="flex items-center gap-3">
               <span className={`text-sm font-medium transition-colors ${!showOnboarding ? 'text-foreground' : 'text-muted-foreground'}`}>
-                대시보드
+                {t('dashboard.onboarding_toggle_dashboard')}
               </span>
               <button
                 onClick={() => setShowOnboarding(!showOnboarding)}
+                role="switch"
+                aria-checked={showOnboarding}
+                aria-label={showOnboarding ? t('dashboard.onboarding_toggle_onboarding') : t('dashboard.onboarding_toggle_dashboard')}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                   showOnboarding ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
@@ -238,7 +241,7 @@ export default function DashboardPage() {
                 />
               </button>
               <span className={`text-sm font-medium transition-colors ${showOnboarding ? 'text-foreground' : 'text-muted-foreground'}`}>
-                온보딩
+                {t('dashboard.onboarding_toggle_onboarding')}
               </span>
             </div>
           </div>
@@ -246,7 +249,7 @@ export default function DashboardPage() {
 
         {/* 에러 상태 표시 */}
         {statsError && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4 mb-6">
+          <div role="alert" aria-live="assertive" className="bg-destructive/10 border border-destructive/20 rounded-md p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -270,7 +273,7 @@ export default function DashboardPage() {
                 onClick={handleSkipOnboarding}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors duration-200 shadow-sm"
               >
-                <span>온보딩 건너뛰기</span>
+                <span>{t('dashboard.onboarding_skip_button')}</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -297,11 +300,11 @@ export default function DashboardPage() {
                   </div>
                   
                   <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
-                    안녕하세요, {user?.name || '사용자'}님! 🎉
+                    {t('dashboard.onboarding_welcome_title', { userName: user?.name || t('common.user') })}
                   </CardTitle>
                   
                   <CardDescription className="text-gray-600 text-xl max-w-2xl mx-auto leading-relaxed">
-                    Bidly에 오신 것을 환영합니다! 아래 예시를 통해 RFP 작성 방법을 확인해보세요.
+                    {t('dashboard.onboarding_welcome_description')}
                   </CardDescription>
                 </CardHeader>
 
@@ -315,10 +318,10 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <CardTitle className="text-xl font-bold text-gray-900 mb-3">
-                          간편한 RFP 작성
+                          {t('dashboard.onboarding_easy_rfp_title')}
                         </CardTitle>
                         <CardDescription className="text-gray-600 leading-relaxed">
-                          블록 형태의 직관적인 인터페이스로 누구나 쉽게 RFP를 작성할 수 있습니다.
+                          {t('dashboard.onboarding_easy_rfp_description')}
                         </CardDescription>
                       </CardContent>
                       <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10"></div>
@@ -332,10 +335,10 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <CardTitle className="text-xl font-bold text-gray-900 mb-3">
-                          체계적인 일정 관리
+                          {t('dashboard.onboarding_systematic_schedule_title')}
                         </CardTitle>
                         <CardDescription className="text-gray-600 leading-relaxed">
-                          행사 준비부터 진행까지 모든 일정을 체계적으로 관리할 수 있습니다.
+                          {t('dashboard.onboarding_systematic_schedule_description')}
                         </CardDescription>
                       </CardContent>
                       <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10"></div>
@@ -349,10 +352,10 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <CardTitle className="text-xl font-bold text-gray-900 mb-3">
-                          상세한 분석 리포트
+                          {t('dashboard.onboarding_detailed_analysis_title')}
                         </CardTitle>
                         <CardDescription className="text-gray-600 leading-relaxed">
-                          RFP 진행 현황과 결과를 상세한 분석 리포트로 확인할 수 있습니다.
+                          {t('dashboard.onboarding_detailed_analysis_description')}
                         </CardDescription>
                       </CardContent>
                       <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -mr-10 -mt-10"></div>
@@ -367,10 +370,10 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <h4 className="text-2xl font-bold text-white mb-3">
-                        지금 시작해보세요!
+                        {t('dashboard.onboarding_start_now_title')}
                       </h4>
                       <p className="text-blue-100 text-lg max-w-2xl mx-auto leading-relaxed">
-                        첫 번째 RFP를 작성하고 효율적인 행사 기획을 경험해보세요.
+                        {t('dashboard.onboarding_start_now_description')}
                       </p>
                     </CardContent>
                   </Card>
@@ -389,7 +392,7 @@ export default function DashboardPage() {
                   <div 
                     key={rfp.id} 
                     className="relative cursor-default"
-                    title="예시 카드입니다. 클릭할 수 없습니다."
+                    title={t('dashboard.onboarding_example_card_title')}
                   >
                     <OnboardingRfpCard 
                       rfp={rfp} 
@@ -531,7 +534,7 @@ export default function DashboardPage() {
 
             {/* RFP 목록 에러 상태 */}
             {rfpsError && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4 mb-6">
+              <div role="alert" aria-live="assertive" className="bg-destructive/10 border border-destructive/20 rounded-md p-4 mb-6">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -610,12 +613,12 @@ export default function DashboardPage() {
                                 <svg className="flex-shrink-0 mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
-                                <span>{rfp.selections?.length || 0}개 항목</span>
+                                <span>{rfp.selections?.length || 0}{t('dashboard.rfp_item_count_suffix')}</span>
                               </div>
                             </div>
                           </div>
                           <div className="bg-muted px-6 py-3 text-xs text-muted-foreground">
-                            마지막 업데이트: {formatDate(rfp.updated_at)}
+                            {t('dashboard.last_updated_prefix')}{formatDate(rfp.updated_at)}
                           </div>
                         </div>
                       </Link>

@@ -31,7 +31,7 @@ const COLORS = [
 import { useTranslation } from '@/lib/i18n'; // useTranslation 훅 import
 
 export default function MonthlyRfpChart({ monthlyRfpCounts }: MonthlyRfpChartProps) {
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   // 더미 데이터 생성 함수
   const generateDummyData = () => {

@@ -20,7 +20,7 @@ export default function RecommendationAlert({
   onSelectRecommendation,
   onClose,
 }: RecommendationAlertProps) {
-  const t = useTranslation();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedR1, setSelectedR1] = useState<Set<number>>(new Set());
   const [selectedR2, setSelectedR2] = useState<Set<number>>(new Set());
@@ -99,21 +99,21 @@ export default function RecommendationAlert({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-bold text-base text-gray-900">💡 추천 기능</h3>
+                <h3 className="font-bold text-base text-gray-900">💡 {t('recommendationAlert.title')}</h3>
                 {r1Recommendations.length > 0 && (
                   <Badge variant="destructive" className="flex items-center space-x-1">
                     <Star className="w-3 h-3" />
-                    <span>필수 {r1Recommendations.length}개</span>
+                    <span>{t('recommendationAlert.required')} {r1Recommendations.length}{t('common.unit_count')}</span>
                   </Badge>
                 )}
                 {r2Recommendations.length > 0 && (
                   <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    추가 {r2Recommendations.length}개
+                    {t('recommendationAlert.additional')} {r2Recommendations.length}{t('common.unit_count')}
                   </Badge>
                 )}
               </div>
               <p className="text-xs text-gray-600 mt-0.5">
-                선택하신 기능과 함께 사용하면 더욱 완성도 높은 행사가 됩니다
+                {t('recommendationAlert.description')}
               </p>
             </div>
           </div>
@@ -171,9 +171,9 @@ export default function RecommendationAlert({
               }}
               className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs"
             >
-                              <Plus className="w-3 h-3 mr-1" />
-              모두 추가
-              </Button>
+              <Plus className="w-3 h-3 mr-1" />
+              {t('recommendationAlert.addAllButton')}
+            </Button>
             )}
             <Button
               variant="ghost"
@@ -184,12 +184,12 @@ export default function RecommendationAlert({
               {isExpanded ? (
                 <>
                   <ChevronDown className="w-3 h-3 mr-1" />
-                  접기
+                  {t('recommendationAlert.collapseButton')}
                 </>
               ) : (
                 <>
                   <ChevronUp className="w-3 h-3 mr-1" />
-                  자세히
+                  {t('recommendationAlert.expandButton')}
                 </>
               )}
             </Button>
@@ -216,8 +216,8 @@ export default function RecommendationAlert({
                 <div>
                   <div className="flex items-center space-x-2 mb-4">
                     <Star className="w-5 h-5 text-red-500" />
-                    <h4 className="font-bold text-lg text-gray-900">필수 추천 기능</h4>
-                    <Badge variant="destructive">중요</Badge>
+                    <h4 className="font-bold text-lg text-gray-900">{t('recommendationAlert.requiredFeaturesTitle')}</h4>
+                    <Badge variant="destructive">{t('recommendationAlert.importantBadge')}</Badge>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {r1Recommendations.map((feature) => (
@@ -238,7 +238,7 @@ export default function RecommendationAlert({
                             {feature.is_premium && (
                               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs">
                                 <Sparkles className="w-3 h-3 mr-1" />
-                                프리미엄
+                                {t('recommendationAlert.premiumBadge')}
                               </Badge>
                             )}
                           </div>
@@ -273,9 +273,9 @@ export default function RecommendationAlert({
                 <div>
                   <div className="flex items-center space-x-2 mb-4">
                     <Plus className="w-5 h-5 text-blue-500" />
-                    <h4 className="font-bold text-lg text-gray-900">추가 제안 기능</h4>
+                    <h4 className="font-bold text-lg text-gray-900">{t('recommendationAlert.additionalFeaturesTitle')}</h4>
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      선택사항
+                      {t('recommendationAlert.optionalBadge')}
                     </Badge>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -297,7 +297,7 @@ export default function RecommendationAlert({
                             {feature.is_premium && (
                               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200 text-xs">
                                 <Sparkles className="w-3 h-3 mr-1" />
-                                프리미엄
+                                {t('recommendationAlert.premiumBadge')}
                               </Badge>
                             )}
                           </div>
@@ -326,24 +326,25 @@ export default function RecommendationAlert({
                   </div>
                 </div>
               )}
+
             </div>
 
             {/* 하단 액션 */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-600">
-                  💡 팁: 각 카드를 클릭해서 선택/해제할 수 있습니다
+                  💡 {t('recommendationAlert.tipMessage')}
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium text-gray-700">
-                  총 {selectedR1.size + selectedR2.size}개 선택됨
+                  {t('recommendationAlert.totalSelected', { count: selectedR1.size + selectedR2.size })}
                 </span>
                 <Button
                   onClick={onClose}
                   className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  선택 완료
+                  {t('recommendationAlert.completeSelectionButton')}
                 </Button>
               </div>
             </div>
