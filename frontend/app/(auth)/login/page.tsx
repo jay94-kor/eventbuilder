@@ -25,6 +25,21 @@ export default function LoginPage() {
       
       setAuth(token, user);
       console.log('로그인 성공:', message);
+      
+      // 사용자 타입에 따라 적절한 대시보드로 리다이렉트
+      switch (user.user_type) {
+        case 'admin':
+          router.push('/admin/dashboard');
+          break;
+        case 'agency_member':
+          router.push('/agency/dashboard');
+          break;
+        case 'vendor_member':
+          router.push('/vendor/dashboard');
+          break;
+        default:
+          router.push('/');
+      }
     } catch (err: any) {
       console.error('로그인 실패:', err.response?.data || err.message);
       setError(err.response?.data?.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
