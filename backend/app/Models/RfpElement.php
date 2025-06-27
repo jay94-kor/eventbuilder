@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids; // HasUuids 트레이트 추가
 
 class RfpElement extends Model
 {
-    use HasUuids; // HasUuids 트레이트 사용
+    use HasFactory, HasUuids; // HasFactory와 HasUuids 트레이트 사용
 
     protected $fillable = [
         'rfp_id',

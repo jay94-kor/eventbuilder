@@ -116,6 +116,19 @@ class RfpController extends Controller
         // 현재 인증된 사용자 정보 (사내 행사 담당자)
         $user = Auth::user();
 
+        // 권한 체크: agency_member만 RFP를 생성할 수 있음
+        if ($user->user_type !== 'agency_member' && $user->user_type !== 'admin') {
+            return response()->json(['message' => 'RFP 생성 권한이 없습니다.'], 403);
+        }
+
+        // 대행사 멤버인 경우 소속 대행사가 있는지 확인
+        if ($user->user_type === 'agency_member') {
+            $agencyId = $user->agency_members->first()->agency_id ?? null;
+            if (!$agencyId) {
+                return response()->json(['message' => '소속된 대행사 정보를 찾을 수 없습니다.'], 403);
+            }
+        }
+
         // 데이터베이스 트랜잭션 시작
         // 프로젝트, RFP, RFP 요소 생성이 모두 성공해야 하므로 트랜잭션으로 묶습니다.
         DB::beginTransaction();
