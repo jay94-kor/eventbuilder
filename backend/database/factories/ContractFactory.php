@@ -31,7 +31,9 @@ class ContractFactory extends Factory
             'contract_file_path' => $this->faker->optional()->filePath(),
             'contract_signed_at' => $this->faker->optional()->dateTimeThisMonth(),
             'prepayment_amount' => $prepaymentAmount,
+            'prepayment_paid_at' => $this->faker->optional()->dateTimeThisMonth(),
             'balance_amount' => $balanceAmount,
+            'balance_paid_at' => $this->faker->optional()->dateTimeThisMonth(),
             'payment_status' => $this->faker->randomElement(['pending', 'prepayment_paid', 'balance_paid', 'all_paid']),
         ];
     }

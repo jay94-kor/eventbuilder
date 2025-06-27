@@ -316,7 +316,7 @@ class AnnouncementController extends Controller
             if (!$vendor) {
                 return response()->json(['message' => '소속된 용역사 정보를 찾을 수 없습니다.'], 403);
             }
-            $vendorSpecialties = json_decode($vendor->specialties ?? '[]', true);
+            $vendorSpecialties = $vendor->specialties ?? [];
 
             $query = Announcement::where('status', 'open')
                                  ->where('closing_at', '>', now());

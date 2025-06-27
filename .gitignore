@@ -1,0 +1,174 @@
+# ===================================================================
+# EVENTBUILDER PROJECT - ROOT .GITIGNORE
+# ===================================================================
+
+# ===================================================================
+# OS & SYSTEM FILES
+# ===================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.directory
+.Trash-*
+
+# ===================================================================
+# EDITORS & IDEs  
+# ===================================================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs (IntelliJ, PhpStorm, WebStorm, etc.)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Eclipse
+.metadata
+.gradle
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# ===================================================================
+# ENVIRONMENT & CONFIG FILES
+# ===================================================================
+.env
+.env.*
+!.env.example
+.envrc
+.direnv
+
+# ===================================================================
+# LOGS & DEBUG FILES
+# ===================================================================
+*.log
+*.out
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+debug.log
+error.log
+
+# ===================================================================
+# TEMPORARY & CACHE FILES
+# ===================================================================
+tmp/
+temp/
+.tmp/
+.temp/
+.cache/
+.sass-cache/
+.parcel-cache/
+
+# ===================================================================
+# BACKUP FILES
+# ===================================================================
+*.backup
+*.bak
+*.old
+*.orig
+*.save
+backup/
+backups/
+
+# ===================================================================
+# COMPRESSED FILES & ARCHIVES
+# ===================================================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ===================================================================
+# DOCUMENTATION BUILD FILES
+# ===================================================================
+docs/_build/
+site/
+_site/
+
+# ===================================================================
+# DATABASE FILES
+# ===================================================================
+*.db
+*.sqlite
+*.sqlite3
+database.sqlite
+
+# ===================================================================
+# CERTIFICATES & KEYS
+# ===================================================================
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+auth.json
+*.keystore
+
+# ===================================================================
+# PROJECT SPECIFIC
+# ===================================================================
+# Test uploads & temporary files
+test_image.*
+uploads/
+temp_files/
+
+# Project documentation drafts
+TODO.md
+NOTES.md
+DRAFT*.md
+
+# Coverage reports
+coverage/
+.nyc_output/
+.coverage
+htmlcov/
+
+# ===================================================================
+# NOTE: Backend and frontend subdirectories have their own
+# specialized .gitignore files for Laravel and Next.js respectively
+# =================================================================== 

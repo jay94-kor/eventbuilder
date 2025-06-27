@@ -407,7 +407,10 @@ class ProposalApiTest extends TestCase
         $response = $this->actingAs($this->agencyUser)
                          ->patchJson("/api/proposals/{$secondProposal->id}/set-reserve-rank", $rankData);
 
-        $response->assertStatus(422);
+        $response->assertStatus(409)
+                 ->assertJson([
+                     'message' => '해당 예비 순위는 이미 다른 제안서에 설정되어 있습니다.'
+                 ]);
     }
 
     /**

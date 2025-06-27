@@ -378,7 +378,12 @@ class ProposalController extends Controller
             return response()->json(['message' => '제안서를 유찰할 권한이 없습니다.'], 403);
         }
 
-        // 2. 제안서 상태 확인: 'submitted' 또는 'under_review' 상태에서만 유찰 가능
+        // 2. 계약 존재 확인: 이미 계약이 생성된 제안서는 상태 변경 불가 (우선 순위)
+        if (Contract::where('proposal_id', $proposal->id)->exists()) {
+            return response()->json(['message' => '이미 계약이 체결된 제안서는 상태를 변경할 수 없습니다.'], 409);
+        }
+
+        // 3. 제안서 상태 확인: 'submitted' 또는 'under_review' 상태에서만 유찰 가능
         if (!in_array($proposal->status, ['submitted', 'under_review'])) {
             return response()->json(['message' => '현재 상태에서는 제안서를 유찰할 수 없습니다.'], 409); // 409 Conflict
         }
@@ -433,20 +438,32 @@ class ProposalController extends Controller
             return response()->json(['message' => '예비 순위를 설정할 권한이 없습니다.'], 403);
         }
 
-        // 2. 유효성 검사
+        // 2. 제안서 상태 확인: 'awarded' 상태에서는 예비 순위 설정 불가
+        if ($proposal->status === 'awarded') {
+            return response()->json(['message' => '낙찰된 제안서에는 예비 순위를 설정할 수 없습니다.'], 409);
+        }
+
+        // 3. 유효성 검사
         $request->validate([
             'reserve_rank' => [
                 'nullable', // null을 허용하여 예비 순위 해제 가능
                 'integer',
                 'min:1',
-                // 해당 공고 내에서 reserve_rank가 중복되지 않도록 유니크 제약 조건 추가
-                Rule::unique('proposals')->where(function ($query) use ($proposal, $request) {
-                    return $query->where('announcement_id', $proposal->announcement_id)
-                                 ->whereNotNull('reserve_rank') // null 값은 중복 검사에서 제외
-                                 ->where('id', '!=', $proposal->id); // 자기 자신은 제외
-                })->ignore($proposal->id, 'id') // 업데이트 시 자기 자신 무시
             ],
         ]);
+
+        // 4. 중복된 예비 순위 검사
+        $reserveRank = $request->input('reserve_rank');
+        if ($reserveRank !== null) {
+            $existingProposal = Proposal::where('announcement_id', $proposal->announcement_id)
+                                      ->where('reserve_rank', $reserveRank)
+                                      ->where('id', '!=', $proposal->id)
+                                      ->first();
+            
+            if ($existingProposal) {
+                return response()->json(['message' => '해당 예비 순위는 이미 다른 제안서에 설정되어 있습니다.'], 409);
+            }
+        }
 
         DB::beginTransaction();
         try {

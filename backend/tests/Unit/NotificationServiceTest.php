@@ -58,7 +58,7 @@ class NotificationServiceTest extends TestCase
            ->with('Notification sent', \Mockery::type('array'));
 
         $results = $this->notificationService->sendBulkNotification(
-            $users->toArray(),
+            $users->all(),
             'bulk_test',
             'Bulk Title',
             'Bulk Message'

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Contract extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
 
     protected $table = 'contracts';
 
@@ -19,7 +20,9 @@ class Contract extends Model
         'contract_file_path',
         'contract_signed_at',
         'prepayment_amount',
+        'prepayment_paid_at',
         'balance_amount',
+        'balance_paid_at',
         'payment_status',
     ];
 
@@ -28,6 +31,8 @@ class Contract extends Model
         'prepayment_amount' => 'decimal:2',
         'balance_amount' => 'decimal:2',
         'contract_signed_at' => 'datetime',
+        'prepayment_paid_at' => 'datetime',
+        'balance_paid_at' => 'datetime',
     ];
 
     /**
