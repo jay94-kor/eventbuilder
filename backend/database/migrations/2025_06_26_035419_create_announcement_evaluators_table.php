@@ -28,8 +28,7 @@ return new class extends Migration
             $table->unique(['announcement_id', 'user_id'])->comment('한 공고에 같은 심사위원은 한 번만 배정 가능');
         });
 
-        // ENUM 타입 생성 및 적용
-        DB::statement("CREATE TYPE EVALUATOR_ASSIGNMENT_TYPE_ENUM AS ENUM ('random', 'designated')");
+        // ENUM 타입 적용 (ENUM은 이미 첫 번째 마이그레이션에서 생성됨)
         DB::statement("ALTER TABLE announcement_evaluators ALTER COLUMN assignment_type TYPE EVALUATOR_ASSIGNMENT_TYPE_ENUM USING assignment_type::EVALUATOR_ASSIGNMENT_TYPE_ENUM");
         DB::statement("ALTER TABLE announcement_evaluators ALTER COLUMN assignment_type SET DEFAULT 'designated'");
         DB::statement("COMMENT ON TABLE announcement_evaluators IS '공고에 배정된 심사위원 정보를 저장하는 테이블'");
@@ -41,6 +40,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('announcement_evaluators');
-        DB::statement("DROP TYPE IF EXISTS EVALUATOR_ASSIGNMENT_TYPE_ENUM");
+        // ENUM 타입은 첫 번째 마이그레이션에서 관리하므로 여기서는 삭제하지 않음
     }
 };

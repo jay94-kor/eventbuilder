@@ -14,6 +14,68 @@ class RfpController extends Controller
     /**
      * RFP 생성 (POST /api/rfps)
      *
+     * @OA\Post(
+     *     path="/api/rfps",
+     *     tags={"RFP Management"},
+     *     summary="RFP 생성",
+     *     description="새로운 RFP(Request for Proposal)를 생성합니다. 프로젝트와 RFP 요소들을 함께 생성합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"project_name","start_datetime","end_datetime","is_indoor","location","issue_type","closing_at","elements"},
+     *             @OA\Property(property="project_name", type="string", example="2024 신년 행사"),
+     *             @OA\Property(property="start_datetime", type="string", format="date-time", example="2024-02-01T09:00:00Z"),
+     *             @OA\Property(property="end_datetime", type="string", format="date-time", example="2024-02-01T18:00:00Z"),
+     *             @OA\Property(property="preparation_start_datetime", type="string", format="date-time", example="2024-01-30T08:00:00Z"),
+     *             @OA\Property(property="철수_end_datetime", type="string", format="date-time", example="2024-02-02T12:00:00Z"),
+     *             @OA\Property(property="client_name", type="string", example="ABC 회사"),
+     *             @OA\Property(property="client_contact_person", type="string", example="김담당자"),
+     *             @OA\Property(property="client_contact_number", type="string", example="010-1234-5678"),
+     *             @OA\Property(property="is_indoor", type="boolean", example=true),
+     *             @OA\Property(property="location", type="string", example="서울시 강남구 코엑스"),
+     *             @OA\Property(property="budget_including_vat", type="number", example=50000000),
+     *             @OA\Property(property="issue_type", type="string", enum={"integrated","separated_by_element","separated_by_group"}, example="integrated"),
+     *             @OA\Property(property="rfp_description", type="string", example="신년 행사를 위한 종합 이벤트 기획"),
+     *             @OA\Property(property="closing_at", type="string", format="date-time", example="2024-01-25T17:00:00Z"),
+     *             @OA\Property(property="elements", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="element_type", type="string", example="stage"),
+     *                     @OA\Property(property="details", type="object", example={"size": "10m x 8m", "height": "1.2m"}),
+     *                     @OA\Property(property="allocated_budget", type="number", example=10000000),
+     *                     @OA\Property(property="prepayment_ratio", type="number", example=0.3),
+     *                     @OA\Property(property="prepayment_due_date", type="string", format="date", example="2024-01-28"),
+     *                     @OA\Property(property="balance_ratio", type="number", example=0.7),
+     *                     @OA\Property(property="balance_due_date", type="string", format="date", example="2024-02-05")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="RFP 생성 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP가 성공적으로 생성되었습니다."),
+     *             @OA\Property(property="rfp", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="유효성 검사 실패",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="서버 오류",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP 생성 중 오류가 발생했습니다.")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -131,6 +193,42 @@ class RfpController extends Controller
     /**
      * RFP 목록 조회 (GET /api/rfps)
      *
+     * @OA\Get(
+     *     path="/api/rfps",
+     *     tags={"RFP Management"},
+     *     summary="RFP 목록 조회",
+     *     description="사용자가 소속된 대행사의 RFP 목록을 조회합니다. 관리자는 모든 RFP를 조회할 수 있습니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="RFP 목록 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP 목록을 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="rfps", type="object",
+     *                 @OA\Property(property="data", type="array",
+     *                     @OA\Items(type="object",
+     *                         @OA\Property(property="id", type="string", example="01234567-89ab-cdef-0123-456789abcdef"),
+     *                         @OA\Property(property="current_status", type="string", example="draft"),
+     *                         @OA\Property(property="issue_type", type="string", example="integrated"),
+     *                         @OA\Property(property="closing_at", type="string", format="date-time"),
+     *                         @OA\Property(property="project", type="object"),
+     *                         @OA\Property(property="elements", type="array", @OA\Items(type="object"))
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="소속된 대행사 정보를 찾을 수 없습니다.")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -165,6 +263,51 @@ class RfpController extends Controller
 
     /**
      * 특정 RFP 상세 조회 (GET /api/rfps/{rfp})
+     *
+     * @OA\Get(
+     *     path="/api/rfps/{rfp}",
+     *     tags={"RFP Management"},
+     *     summary="RFP 상세 조회",
+     *     description="특정 RFP의 상세 정보를 조회합니다. 프로젝트 정보와 RFP 요소들을 포함합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="rfp",
+     *         in="path",
+     *         required=true,
+     *         description="RFP ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="RFP 상세 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP 상세 정보를 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="rfp", type="object",
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="current_status", type="string"),
+     *                 @OA\Property(property="issue_type", type="string"),
+     *                 @OA\Property(property="rfp_description", type="string"),
+     *                 @OA\Property(property="closing_at", type="string", format="date-time"),
+     *                 @OA\Property(property="project", type="object"),
+     *                 @OA\Property(property="elements", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="이 RFP에 접근할 권한이 없습니다.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="RFP를 찾을 수 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP를 찾을 수 없습니다.")
+     *         )
+     *     )
+     * )
      *
      * @param  \App\Models\Rfp  $rfp  (모델 바인딩)
      * @return \Illuminate\Http\JsonResponse

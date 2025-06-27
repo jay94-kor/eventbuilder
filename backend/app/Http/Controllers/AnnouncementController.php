@@ -16,6 +16,61 @@ class AnnouncementController extends Controller
     /**
      * 승인된 RFP를 입찰 공고로 발행 (POST /api/rfps/{rfp}/publish)
      *
+     * @OA\Post(
+     *     path="/api/rfps/{rfp}/publish",
+     *     tags={"Announcement Management"},
+     *     summary="RFP를 공고로 발행",
+     *     description="승인된 RFP를 입찰 공고로 발행합니다. 발주 타입에 따라 하나 또는 여러 개의 공고가 생성됩니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="rfp",
+     *         in="path",
+     *         required=true,
+     *         description="RFP ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"closing_at","channel_type","contact_info_private","evaluation_criteria"},
+     *             @OA\Property(property="closing_at", type="string", format="date-time", example="2024-01-30T17:00:00Z"),
+     *             @OA\Property(property="estimated_price", type="number", example=45000000),
+     *             @OA\Property(property="channel_type", type="string", enum={"agency_private","public"}, example="public"),
+     *             @OA\Property(property="contact_info_private", type="boolean", example=false),
+     *             @OA\Property(property="evaluation_criteria", type="object",
+     *                 @OA\Property(property="price_weight", type="number", example=40),
+     *                 @OA\Property(property="portfolio_weight", type="number", example=35),
+     *                 @OA\Property(property="additional_weight", type="number", example=25),
+     *                 @OA\Property(property="price_deduction_rate", type="number", example=5),
+     *                 @OA\Property(property="price_rank_deduction_points", type="array", @OA\Items(type="number"), example={10, 20, 30})
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="공고 발행 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP가 성공적으로 공고로 발행되었습니다. (총 1개 공고 생성)"),
+     *             @OA\Property(property="rfp_status", type="string", example="published"),
+     *             @OA\Property(property="announcements_count", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="공고 발행 권한이 없습니다.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="상태 충돌",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="승인되지 않았거나 이미 공고된 RFP입니다.")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Rfp  $rfp
      * @return \Illuminate\Http\JsonResponse
@@ -207,6 +262,45 @@ class AnnouncementController extends Controller
     /**
      * 공고 목록 조회 (GET /api/announcements)
      * 용역사가 자신의 전문 분야에 맞는 공고를 찾을 때 사용
+     *
+     * @OA\Get(
+     *     path="/api/announcements",
+     *     tags={"Announcement Management"},
+     *     summary="공고 목록 조회",
+     *     description="공개된 입찰 공고 목록을 조회합니다. 용역사는 자신의 전문 분야와 승인된 대행사의 공고를 볼 수 있습니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="공고 목록 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="입찰 공고 목록을 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="announcements", type="object",
+     *                 @OA\Property(property="data", type="array",
+     *                     @OA\Items(type="object",
+     *                         @OA\Property(property="id", type="string"),
+     *                         @OA\Property(property="title", type="string"),
+     *                         @OA\Property(property="description", type="string"),
+     *                         @OA\Property(property="estimated_price", type="number"),
+     *                         @OA\Property(property="closing_at", type="string", format="date-time"),
+     *                         @OA\Property(property="channel_type", type="string"),
+     *                         @OA\Property(property="status", type="string"),
+     *                         @OA\Property(property="rfp", type="object"),
+     *                         @OA\Property(property="agency", type="object")
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="소속된 용역사 정보를 찾을 수 없습니다.")
+     *         )
+     *     )
+     * )
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse

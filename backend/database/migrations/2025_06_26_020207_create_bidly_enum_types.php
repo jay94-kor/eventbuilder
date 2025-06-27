@@ -13,6 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         // 기존 ENUM 타입이 존재할 경우 먼저 드롭
+        DB::statement("DROP TYPE IF EXISTS SCHEDULE_ACTIVITY_TYPE_ENUM");
+        DB::statement("DROP TYPE IF EXISTS SCHEDULE_STATUS_ENUM");
+        DB::statement("DROP TYPE IF EXISTS EVALUATOR_ASSIGNMENT_TYPE_ENUM");
         DB::statement("DROP TYPE IF EXISTS VENDOR_ACCOUNT_STATUS_ENUM");
         DB::statement("DROP TYPE IF EXISTS SUBSCRIPTION_STATUS_ENUM");
         DB::statement("DROP TYPE IF EXISTS NOTIFICATION_TYPE_ENUM");
@@ -74,6 +77,44 @@ return new class extends Migration
         // 용역사 계정 상태
         DB::statement("CREATE TYPE VENDOR_ACCOUNT_STATUS_ENUM AS ENUM ('active', 'suspended', 'permanently_banned')");
         DB::statement("COMMENT ON TYPE VENDOR_ACCOUNT_STATUS_ENUM IS '용역사 계정 상태: 활성, 일시 정지됨, 영구 제명됨'");
+
+        // 심사위원 배정 방식
+        DB::statement("CREATE TYPE EVALUATOR_ASSIGNMENT_TYPE_ENUM AS ENUM ('random', 'designated')");
+        DB::statement("COMMENT ON TYPE EVALUATOR_ASSIGNMENT_TYPE_ENUM IS '심사위원 배정 방식: 무작위 배정, 지정 배정'");
+
+        // 스케줄 상태
+        DB::statement("CREATE TYPE SCHEDULE_STATUS_ENUM AS ENUM ('planned', 'ongoing', 'completed', 'cancelled')");
+        DB::statement("COMMENT ON TYPE SCHEDULE_STATUS_ENUM IS '스케줄 상태: 계획됨, 진행 중, 완료됨, 취소됨'");
+
+        // 스케줄 활동 유형
+        DB::statement("
+            CREATE TYPE SCHEDULE_ACTIVITY_TYPE_ENUM AS ENUM (
+                'meeting',
+                'delivery', 
+                'installation',
+                'dismantling',
+                'rehearsal',
+                'event_execution',
+                'setup',
+                'testing', 
+                'load_in',
+                'load_out',
+                'storage',
+                'breakdown',
+                'cleaning',
+                'training',
+                'briefing',
+                'pickup',
+                'transportation',
+                'site_visit',
+                'concept_meeting',
+                'technical_rehearsal',
+                'dress_rehearsal',
+                'final_inspection',
+                'wrap_up'
+            )
+        ");
+        DB::statement("COMMENT ON TYPE SCHEDULE_ACTIVITY_TYPE_ENUM IS '스케줄 활동 유형: 회의, 배송, 설치, 철거, 리허설, 행사 실행 등'");
     }
 
     /**
@@ -81,6 +122,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::statement("DROP TYPE IF EXISTS SCHEDULE_ACTIVITY_TYPE_ENUM");
+        DB::statement("DROP TYPE IF EXISTS SCHEDULE_STATUS_ENUM");
+        DB::statement("DROP TYPE IF EXISTS EVALUATOR_ASSIGNMENT_TYPE_ENUM");
         DB::statement("DROP TYPE IF EXISTS VENDOR_ACCOUNT_STATUS_ENUM");
         DB::statement("DROP TYPE IF EXISTS SUBSCRIPTION_STATUS_ENUM");
         DB::statement("DROP TYPE IF EXISTS NOTIFICATION_TYPE_ENUM");

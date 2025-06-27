@@ -17,6 +17,55 @@ class ScheduleController extends Controller
      * 스케줄 목록 조회 (GET /api/schedules)
      * 특정 엔티티(프로젝트/공고)의 스케줄 또는 전체 스케줄 조회
      *
+     * @OA\Get(
+     *     path="/api/schedules",
+     *     tags={"Schedule Management"},
+     *     summary="스케줄 목록 조회",
+     *     description="프로젝트 또는 공고에 연결된 스케줄 목록을 조회합니다. 대행사 멤버는 자신의 대행사 스케줄만 조회할 수 있습니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="schedulable_type",
+     *         in="query",
+     *         description="스케줄이 연결된 엔티티 타입",
+     *         @OA\Schema(type="string", enum={"App\\Models\\Project", "App\\Models\\Announcement"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="schedulable_id",
+     *         in="query",
+     *         description="스케줄이 연결된 엔티티 ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="스케줄 목록 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="스케줄 목록을 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="schedules", type="object",
+     *                 @OA\Property(property="data", type="array",
+     *                     @OA\Items(type="object",
+     *                         @OA\Property(property="id", type="string"),
+     *                         @OA\Property(property="title", type="string"),
+     *                         @OA\Property(property="description", type="string"),
+     *                         @OA\Property(property="start_datetime", type="string", format="date-time"),
+     *                         @OA\Property(property="end_datetime", type="string", format="date-time"),
+     *                         @OA\Property(property="location", type="string"),
+     *                         @OA\Property(property="status", type="string"),
+     *                         @OA\Property(property="type", type="string"),
+     *                         @OA\Property(property="schedulable", type="object")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="스케줄을 조회할 권한이 없습니다.")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */

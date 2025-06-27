@@ -16,6 +16,55 @@ class ProposalController extends Controller
     /**
      * 특정 공고에 제안서 제출 (POST /api/announcements/{announcement}/proposals)
      *
+     * @OA\Post(
+     *     path="/api/announcements/{announcement}/proposals",
+     *     tags={"Proposal Management"},
+     *     summary="제안서 제출",
+     *     description="특정 공고에 제안서를 제출합니다. 용역사만 제출 가능하며, 공고당 한 번만 제출할 수 있습니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="announcement",
+     *         in="path",
+     *         required=true,
+     *         description="공고 ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="proposed_price", type="number", example=42000000, description="제안 금액"),
+     *             @OA\Property(property="proposal_text", type="string", example="저희 회사는 10년간의 무대 설치 경험을 바탕으로...", description="제안서 내용")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="제안서 제출 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="제안서가 성공적으로 제출되었습니다."),
+     *             @OA\Property(property="proposal", type="object",
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="proposed_price", type="number"),
+     *                 @OA\Property(property="proposal_text", type="string"),
+     *                 @OA\Property(property="status", type="string", example="submitted")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="제안서 제출 권한이 없습니다.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="중복 제출",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="이미 해당 공고에 제안서를 제출했습니다.")
+     *         )
+     *     )
+     * )
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Announcement  $announcement
      * @return \Illuminate\Http\JsonResponse
@@ -170,6 +219,54 @@ class ProposalController extends Controller
     /**
      * 제안서 낙찰 처리 (POST /api/proposals/{proposal}/award)
      * (대행사 또는 관리자만 가능)
+     *
+     * @OA\Post(
+     *     path="/api/proposals/{proposal}/award",
+     *     tags={"Proposal Management"},
+     *     summary="제안서 낙찰",
+     *     description="특정 제안서를 낙찰 처리합니다. 계약이 자동으로 생성되고 다른 제안서들은 유찰 처리됩니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="proposal",
+     *         in="path",
+     *         required=true,
+     *         description="제안서 ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="final_price", type="number", example=40000000, description="최종 계약 금액")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="낙찰 처리 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="제안서가 성공적으로 낙찰되었습니다."),
+     *             @OA\Property(property="proposal", type="object"),
+     *             @OA\Property(property="contract", type="object",
+     *                 @OA\Property(property="id", type="string"),
+     *                 @OA\Property(property="final_price", type="number"),
+     *                 @OA\Property(property="payment_status", type="string", example="pending")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="제안서를 낙찰할 권한이 없습니다.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="상태 충돌",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="현재 상태에서는 제안서를 낙찰할 수 없습니다.")
+     *         )
+     *     )
+     * )
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Proposal  $proposal
