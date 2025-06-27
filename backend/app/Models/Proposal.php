@@ -18,10 +18,16 @@ class Proposal extends Model
         'proposal_file_path',
         'status',
         'reserve_rank',
+        'evaluation_process_status',
+        'presentation_order',
+        'presentation_scheduled_at',
+        'presentation_duration_minutes',
     ];
 
     protected $casts = [
         'proposed_price' => 'decimal:2', // 금액은 소수점 2자리까지
+        'evaluation_process_status' => 'array',
+        'presentation_scheduled_at' => 'datetime',
     ];
 
     /**

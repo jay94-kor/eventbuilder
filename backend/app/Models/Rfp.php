@@ -18,7 +18,9 @@ class Rfp extends Model
         'issue_type',
         'rfp_description',
         'closing_at',
-        'published_at', // published_at도 fillable에 추가
+        'published_at',
+        'is_client_name_public',
+        'is_budget_public',
     ];
 
     public function project()

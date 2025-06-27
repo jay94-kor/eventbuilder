@@ -34,20 +34,17 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * RefreshDatabase 트레잇의 refreshTestDatabase 메서드를 오버라이드하여
-     * personal_access_tokens 테이블 문제를 근본적으로 해결합니다.
+     * 스키마 덤프 방식에 맞게 테스트 데이터베이스를 초기화합니다.
      */
     protected function refreshTestDatabase()
     {
         if (! static::$testMigrated) {
-            // 1. 기본 마이그레이션 실행
+            // 스키마 덤프를 사용하여 데이터베이스 초기화
             $this->artisan('migrate:fresh', [
                 '--database' => $this->app->make('config')->get('database.default'),
                 '--drop-views' => $this->shouldDropViews(),
                 '--drop-types' => $this->shouldDropTypes(),
             ]);
-
-            // 2. personal_access_tokens 테이블이 제대로 생성되었는지 확인하고 필요시 재생성
-            $this->ensurePersonalAccessTokensTable();
 
             $this->app[Kernel::class]->setArtisan(null);
 

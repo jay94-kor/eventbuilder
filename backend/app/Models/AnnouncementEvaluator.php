@@ -12,8 +12,9 @@ class AnnouncementEvaluator extends Model
 
     protected $fillable = [
         'announcement_id',
-        'user_id',
+        'evaluator_user_id',
         'assignment_type',
+        'scope_type',
         'assigned_at',
     ];
 
@@ -34,6 +35,6 @@ class AnnouncementEvaluator extends Model
      */
     public function evaluator()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'evaluator_user_id');
     }
 }

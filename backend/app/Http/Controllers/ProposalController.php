@@ -7,12 +7,20 @@ use App\Models\Announcement;
 use App\Models\Proposal;
 use App\Models\VendorMember;
 use App\Models\Contract;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ProposalController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * 특정 공고에 제안서 제출 (POST /api/announcements/{announcement}/proposals)
      *
@@ -451,8 +459,29 @@ class ProposalController extends Controller
         DB::beginTransaction();
         try {
             // 3. 제안서의 예비 순위 업데이트
-            $proposal->reserve_rank = $request->input('reserve_rank');
+            $reserveRank = $request->input('reserve_rank');
+            $proposal->reserve_rank = $reserveRank;
             $proposal->save();
+
+            // 4. 예비 번호 부여 시 알림 발송
+            if ($reserveRank !== null) {
+                $proposal->load('vendor.vendorMembers.user', 'announcement');
+                $masterUser = $proposal->vendor->vendorMembers()
+                    ->where('is_master', true)
+                    ->first()?->user;
+
+                if ($masterUser) {
+                    $this->notificationService->sendReserveRankAssignedNotification(
+                        $masterUser->id,
+                        $reserveRank,
+                        $proposal->announcement->title,
+                        [
+                            'announcement_id' => $proposal->announcement->id,
+                            'proposal_id' => $proposal->id,
+                        ]
+                    );
+                }
+            }
 
             DB::commit();
             return response()->json([
@@ -556,12 +585,30 @@ class ProposalController extends Controller
             $proposal->announcement->status = 'closed';
             $proposal->announcement->save();
 
+            // 8. 낙찰 알림 발송
+            $proposal->load('vendor.vendorMembers.user', 'announcement');
+            $masterUser = $proposal->vendor->vendorMembers()
+                ->where('is_master', true)
+                ->first()?->user;
+
+            if ($masterUser) {
+                $this->notificationService->sendProposalAwardedNotification(
+                    $masterUser->id,
+                    $proposal->announcement->title,
+                    $finalPrice,
+                    [
+                        'announcement_id' => $proposal->announcement->id,
+                        'proposal_id' => $proposal->id,
+                        'contract_id' => $contract->id,
+                    ]
+                );
+            }
+
             DB::commit();
             return response()->json([
                 'message' => '예비 제안서가 성공적으로 정식 낙찰자로 승격되었습니다.',
                 'proposal' => $proposal,
                 'contract' => $contract,
-                'previous_winner_rejection_reason' => $request->input('rejection_reason_for_previous_winner'),
             ], 200);
 
         } catch (\Exception $e) {

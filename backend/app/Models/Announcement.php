@@ -24,6 +24,7 @@ class Announcement extends Model
         'published_at',
         'status',
         'evaluation_criteria',
+        'evaluation_steps',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class Announcement extends Model
         'published_at' => 'datetime',
         'contact_info_private' => 'boolean',
         'evaluation_criteria' => 'array',
+        'evaluation_steps' => 'array',
     ];
 
     /**
