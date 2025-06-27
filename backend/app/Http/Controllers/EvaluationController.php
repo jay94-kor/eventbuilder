@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Announcement;
 use App\Models\AnnouncementEvaluator;
 use App\Models\Evaluation;
-use App\Models\EvaluatorHistory;
 use App\Models\Proposal;
 use App\Models\User;
 
@@ -126,49 +125,13 @@ class EvaluationController extends Controller
             // 현재는 임시로 0으로 설정
             $priceScore = 0; // TODO: 가격 점수 계산 로직 구현
 
-            // 총점 계산
-            $totalScore = $priceScore + $validatedData['portfolio_score'] + $validatedData['additional_score'];
-
             $evaluation = Evaluation::create([
                 'proposal_id' => $proposal->id,
                 'evaluator_user_id' => $user->id,
                 'price_score' => $priceScore,
                 'portfolio_score' => $validatedData['portfolio_score'],
                 'additional_score' => $validatedData['additional_score'],
-                'total_score' => $totalScore,
-                'evaluation_comment' => $validatedData['comment'] ?? null,
-                'submitted_at' => now(),
-            ]);
-
-            // 📝 심사위원 이력 자동 생성
-            $announcement = $proposal->announcement;
-            $rfp = $announcement->rfp;
-            $project = $rfp->project;
-
-            // RFP 요소 타입 결정 (공고가 특정 요소에 대한 것인지 확인)
-            $elementType = 'general'; // 기본값
-            if ($announcement->rfp_element_id) {
-                $rfpElement = $announcement->rfpElement;
-                $elementType = $rfpElement->element_type ?? 'general';
-            } else {
-                // 통합 발주인 경우 첫 번째 요소 타입 사용
-                $firstElement = $rfp->elements()->first();
-                if ($firstElement) {
-                    $elementType = $firstElement->element_type;
-                }
-            }
-
-            EvaluatorHistory::create([
-                'evaluator_user_id' => $user->id,
-                'announcement_id' => $announcement->id,
-                'proposal_id' => $proposal->id,
-                'element_type' => $elementType,
-                'project_id' => $project->id,
-                'project_name' => $project->project_name,
-                'evaluation_score' => $totalScore,
-                'evaluation_completed' => true,
-                'evaluation_completed_at' => now(),
-                'evaluation_notes' => $validatedData['comment'] ?? null,
+                'comment' => $validatedData['comment'] ?? null,
             ]);
 
             DB::commit();
@@ -176,7 +139,6 @@ class EvaluationController extends Controller
             return response()->json([
                 'message' => '평가 점수가 성공적으로 제출되었습니다.',
                 'evaluation' => $evaluation->load('proposal', 'evaluator'),
-                'evaluator_history_recorded' => true,
             ], 201);
 
         } catch (\Exception $e) {

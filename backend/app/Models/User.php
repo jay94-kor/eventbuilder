@@ -82,37 +82,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(AnnouncementEvaluator::class);
     }
-
-    /**
-     * 이 사용자의 심사위원 이력들.
-     */
-    public function evaluator_histories()
-    {
-        return $this->hasMany(EvaluatorHistory::class, 'evaluator_user_id');
-    }
-
-    /**
-     * 특정 요소에 대한 이 사용자의 평가 이력.
-     */
-    public function getExpertiseInElement($elementType)
-    {
-        return $this->evaluator_histories()
-            ->where('element_type', $elementType)
-            ->where('evaluation_completed', true)
-            ->count();
-    }
-
-    /**
-     * 이 사용자가 가장 많이 평가한 요소 타입.
-     */
-    public function getTopExpertiseElement()
-    {
-        return $this->evaluator_histories()
-            ->where('evaluation_completed', true)
-            ->select('element_type')
-            ->selectRaw('COUNT(*) as count')
-            ->groupBy('element_type')
-            ->orderByDesc('count')
-            ->first();
-    }
 }

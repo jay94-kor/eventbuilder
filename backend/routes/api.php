@@ -12,12 +12,6 @@ use App\Http\Controllers\EvaluationController; // EvaluationController 추가
 use App\Http\Controllers\ContractController; // ContractController 추가
 use App\Http\Controllers\ScheduleController; // ScheduleController 추가
 use App\Http\Controllers\ScheduleAttachmentController; // ScheduleAttachmentController 추가
-use App\Http\Controllers\EvaluatorRecommendationController; // EvaluatorRecommendationController 추가
-use App\Http\Controllers\UserController; // UserController 추가
-use App\Http\Controllers\EvaluatorAssignmentController; // EvaluatorAssignmentController 추가
-use App\Http\Controllers\EvaluationStepController; // EvaluationStepController 추가
-use App\Http\Controllers\ContractMeetingController; // ContractMeetingController 추가
-use App\Http\Controllers\NotificationController; // NotificationController 추가
 
 /*
 |--------------------------------------------------------------------------
@@ -35,11 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
 
     // RFP 관련 라우트
-    Route::get('/rfps', [RfpController::class, 'index']);
     Route::post('/rfps', [RfpController::class, 'store']);
+    Route::get('/rfps', [RfpController::class, 'index']);
     Route::get('/rfps/{rfp}', [RfpController::class, 'show']);
-    Route::put('/rfps/{rfp}', [RfpController::class, 'update']);
-    Route::post('/rfps/{rfp}/resubmit', [RfpController::class, 'resubmit']);
 
     // RFP 요소 정의 관련 라우트 (기존 index 포함, NEW: store, update, destroy)
     Route::get('/element-definitions', [ElementDefinitionController::class, 'index']);
@@ -71,19 +63,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/announcements/{announcement}/evaluation-summary', [EvaluationController::class, 'getEvaluationSummary']); // 평가 현황 조회
     Route::get('/my-evaluations', [EvaluationController::class, 'getMyEvaluations']); // 내 평가 과제 조회
 
-    // 심사위원 추천 시스템 관련 라우트 (NEW: Evaluator Recommendation System)
-    Route::get('/evaluators/recommendations/{elementType}', [EvaluatorRecommendationController::class, 'getRecommendations']);
-    Route::get('/evaluators/{userId}/expertise', [EvaluatorRecommendationController::class, 'getUserExpertise']);
-    Route::get('/evaluators/statistics', [EvaluatorRecommendationController::class, 'getStatistics']);
-
     // 계약 관리 관련 라우트 (NEW: Contract Management)
     Route::get('/contracts', [ContractController::class, 'index']); // 계약 목록 조회
     Route::get('/contracts/{contract}', [ContractController::class, 'show']); // 특정 계약 상세 조회
-    Route::put('/contracts/{contract}', [ContractController::class, 'update']);
+    Route::patch('/contracts/{contract}/update-payment-status', [ContractController::class, 'updatePaymentStatus']); // 계약 결제 상태 업데이트
 
     // 스케줄 관리 관련 라우트 (NEW: Schedule Management)
     Route::get('/schedules', [ScheduleController::class, 'index']); // 스케줄 목록 조회
-    Route::get('/my-schedules', [ScheduleController::class, 'mySchedules']);
     Route::post('/schedules', [ScheduleController::class, 'store']); // 새 스케줄 생성
     Route::get('/schedules/{schedule}', [ScheduleController::class, 'show']); // 특정 스케줄 상세 조회
     Route::put('/schedules/{schedule}', [ScheduleController::class, 'update']); // 스케줄 수정
@@ -94,40 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/schedules/{schedule}/attachments', [ScheduleAttachmentController::class, 'index']); // 첨부 파일 목록 조회
     Route::get('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'download']); // 파일 다운로드
     Route::delete('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'destroy']); // 첨부 파일 삭제
-
-    // 사용자 및 조직 관리 (UserController)
-    Route::get('/agency-members', [UserController::class, 'getAgencyMembers']);
-    Route::get('/agencies', [UserController::class, 'getAgencies']);
-    Route::get('/vendors', [UserController::class, 'getVendors']);
-
-    // 심사위원 배정 (EvaluatorAssignmentController)
-    Route::post('/projects/{project}/assign-evaluators', [EvaluatorAssignmentController::class, 'assignToProject']);
-    Route::post('/rfps/{rfp}/assign-evaluators', [EvaluatorAssignmentController::class, 'assignToRfp']);
-    Route::post('/announcements/{announcement}/assign-evaluators', [EvaluatorAssignmentController::class, 'assignToAnnouncement']);
-    Route::get('/projects/{project}/announcements', [EvaluatorAssignmentController::class, 'getProjectAnnouncements']);
-    Route::get('/rfps/{rfp}/announcements', [EvaluatorAssignmentController::class, 'getRfpAnnouncements']);
-
-    // 평가 관리 (EvaluationController)
-    Route::post('/proposals/{proposal}/evaluations', [EvaluationController::class, 'submitScore']);
-    Route::get('/announcements/{announcement}/evaluation-status', [EvaluationController::class, 'getEvaluationStatus']);
-
-    // 평가 단계 관리 (EvaluationStepController) - NEW
-    Route::post('/announcements/{announcement}/evaluate-step', [EvaluationStepController::class, 'evaluateStep']);
-    Route::post('/announcements/{announcement}/randomize-proposal-order', [EvaluationStepController::class, 'randomizePresentationOrder']);
-    Route::post('/announcements/{announcement}/schedule-presentations', [EvaluationStepController::class, 'schedulePresentations']);
-
-    // 계약 미팅 관리 (ContractMeetingController) - NEW
-    Route::post('/contracts/{contract}/propose-meeting-dates', [ContractMeetingController::class, 'proposeMeetingDates']);
-    Route::patch('/contracts/{contract}/select-meeting-date', [ContractMeetingController::class, 'selectMeetingDate']);
-    Route::get('/contracts/{contract}/meeting-status', [ContractMeetingController::class, 'getMeetingStatus']);
-
-    // 알림 관리 (NotificationController) - NEW
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
-    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
-    Route::patch('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
-    Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
-    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
     // 여기에 향후 다른 인증 필요한 API 라우트를 추가합니다.
 });

@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/jangdongjae/Documents/GitHub/eventbuilder/frontend/app/layout\":[\"static/media/45cca0c1391027f2-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"

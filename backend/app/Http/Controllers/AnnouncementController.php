@@ -103,11 +103,6 @@ class AnnouncementController extends Controller
             'evaluation_criteria.price_deduction_rate' => 'required|numeric|min:0|max:100', // 2등부터 깎이는 비율
             'evaluation_criteria.price_rank_deduction_points' => 'required|array', // 2등, 3등 등에 대한 깎이는 점수 배열 (예: [10, 20])
             'evaluation_criteria.price_rank_deduction_points.*' => 'numeric|min:0|max:100',
-            'evaluation_steps' => 'nullable|array', // 평가/협상 단계 정보
-            'evaluation_steps.*.step_name' => 'required|string|max:255',
-            'evaluation_steps.*.start_date' => 'required|date',
-            'evaluation_steps.*.end_date' => 'required|date|after_or_equal:evaluation_steps.*.start_date',
-            'evaluation_steps.*.send_pass_fail_notification' => 'required|boolean',
         ]);
 
         // 총 비중 100% 검증 (서버 측에서 다시 한번 확인)
@@ -125,7 +120,6 @@ class AnnouncementController extends Controller
             $channelType = $request->input('channel_type');
             $contactInfoPrivate = $request->input('contact_info_private');
             $evaluationCriteria = $request->input('evaluation_criteria');
-            $evaluationSteps = $request->input('evaluation_steps');
 
             $announcementsCount = 0;
 
@@ -164,7 +158,6 @@ class AnnouncementController extends Controller
                     'published_at' => now(),
                     'status' => 'open',
                     'evaluation_criteria' => $evaluationCriteria,
-                    'evaluation_steps' => $evaluationSteps,
                 ]);
                 $announcementsCount = 1;
             } else { // 'separated_by_element' 또는 'separated_by_group'
@@ -239,7 +232,6 @@ class AnnouncementController extends Controller
                         'published_at' => now(),
                         'status' => 'open',
                         'evaluation_criteria' => $evaluationCriteria,
-                        'evaluation_steps' => $evaluationSteps,
                     ]);
                     $announcementsCount++;
                 }

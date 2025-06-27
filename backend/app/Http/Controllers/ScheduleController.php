@@ -15,177 +15,106 @@ class ScheduleController extends Controller
 {
     /**
      * 스케줄 목록 조회 (GET /api/schedules)
+     * 특정 엔티티(프로젝트/공고)의 스케줄 또는 전체 스케줄 조회
      *
      * @OA\Get(
      *     path="/api/schedules",
      *     tags={"Schedule Management"},
      *     summary="스케줄 목록 조회",
-     *     description="사용자별, 기간별, 타입별로 스케줄 목록을 조회합니다.",
+     *     description="프로젝트 또는 공고에 연결된 스케줄 목록을 조회합니다. 대행사 멤버는 자신의 대행사 스케줄만 조회할 수 있습니다.",
      *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="schedulable_type",
      *         in="query",
-     *         description="스케줄 타입 (App\\Models\\Project, App\\Models\\Announcement, App\\Models\\Contract)",
-     *         @OA\Schema(type="string")
+     *         description="스케줄이 연결된 엔티티 타입",
+     *         @OA\Schema(type="string", enum={"App\\Models\\Project", "App\\Models\\Announcement"})
      *     ),
      *     @OA\Parameter(
      *         name="schedulable_id",
      *         in="query",
-     *         description="스케줄 대상 ID",
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="start_date",
-     *         in="query",
-     *         description="조회 시작 날짜 (YYYY-MM-DD)",
-     *         @OA\Schema(type="string", format="date", example="2024-01-01")
-     *     ),
-     *     @OA\Parameter(
-     *         name="end_date",
-     *         in="query",
-     *         description="조회 종료 날짜 (YYYY-MM-DD)",
-     *         @OA\Schema(type="string", format="date", example="2024-01-31")
-     *     ),
-     *     @OA\Parameter(
-     *         name="my_schedules_only",
-     *         in="query",
-     *         description="내 일정만 조회 (true/false)",
-     *         @OA\Schema(type="boolean", default=false)
-     *     ),
-     *     @OA\Parameter(
-     *         name="type",
-     *         in="query",
-     *         description="스케줄 활동 타입",
-     *         @OA\Schema(type="string", enum={"meeting","site_visit","preparation","event_execution","cleanup","evaluation","contract_signing","other"})
+     *         description="스케줄이 연결된 엔티티 ID",
+     *         @OA\Schema(type="string", format="uuid")
      *     ),
      *     @OA\Response(
      *         response=200,
      *         description="스케줄 목록 조회 성공",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="스케줄 목록을 성공적으로 불러왔습니다."),
-     *             @OA\Property(
-     *                 property="schedules",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="string"),
-     *                     @OA\Property(property="title", type="string"),
-     *                     @OA\Property(property="description", type="string"),
-     *                     @OA\Property(property="scheduled_at", type="string", format="date-time"),
-     *                     @OA\Property(property="type", type="string"),
-     *                     @OA\Property(property="status", type="string"),
-     *                     @OA\Property(property="schedulable_type", type="string"),
-     *                     @OA\Property(property="schedulable_id", type="string")
+     *             @OA\Property(property="schedules", type="object",
+     *                 @OA\Property(property="data", type="array",
+     *                     @OA\Items(type="object",
+     *                         @OA\Property(property="id", type="string"),
+     *                         @OA\Property(property="title", type="string"),
+     *                         @OA\Property(property="description", type="string"),
+     *                         @OA\Property(property="start_datetime", type="string", format="date-time"),
+     *                         @OA\Property(property="end_datetime", type="string", format="date-time"),
+     *                         @OA\Property(property="location", type="string"),
+     *                         @OA\Property(property="status", type="string"),
+     *                         @OA\Property(property="type", type="string"),
+     *                         @OA\Property(property="schedulable", type="object")
+     *                     )
      *                 )
-     *             ),
-     *             @OA\Property(property="total_count", type="integer")
+     *             )
      *         )
      *     ),
-     *     @OA\Response(response=403, description="권한 없음")
+     *     @OA\Response(
+     *         response=403,
+     *         description="권한 없음",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="스케줄을 조회할 권한이 없습니다.")
+     *         )
+     *     )
      * )
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
         $user = Auth::user();
-
-        // 기본 쿼리 빌더
         $query = Schedule::query();
 
-        // 사용자별 권한에 따른 필터링
-        if ($user->user_type === 'agency_member') {
-            $userAgencyId = $user->agency_members->first()->agency_id ?? null;
-            if (!$userAgencyId) {
-                return response()->json(['message' => '소속 대행사 정보를 찾을 수 없습니다.'], 403);
-            }
+        // 특정 엔티티의 스케줄만 조회하는 경우
+        if ($request->has('schedulable_type') && $request->has('schedulable_id')) {
+            $query->where('schedulable_type', $request->schedulable_type)
+                  ->where('schedulable_id', $request->schedulable_id);
+        }
 
-            // 대행사 멤버는 자신의 대행사와 관련된 스케줄만 조회
-            $query->where(function ($q) use ($userAgencyId) {
-                $q->whereHasMorph('schedulable', ['App\\Models\\Project'], function ($subQuery) use ($userAgencyId) {
-                    $subQuery->where('agency_id', $userAgencyId);
-                })
-                ->orWhereHasMorph('schedulable', ['App\\Models\\Announcement'], function ($subQuery) use ($userAgencyId) {
-                    $subQuery->where('agency_id', $userAgencyId);
-                })
-                ->orWhereHasMorph('schedulable', ['App\\Models\\Contract'], function ($subQuery) use ($userAgencyId) {
-                    $subQuery->whereHas('proposal.announcement', function ($announcementQuery) use ($userAgencyId) {
-                        $announcementQuery->where('agency_id', $userAgencyId);
-                    });
+        // 권한에 따른 필터링
+        if ($user->user_type === 'admin') {
+            // 관리자는 모든 스케줄 조회 가능
+        } elseif ($user->user_type === 'agency_member') {
+            $agencyId = $user->agency_members->first()->agency_id ?? null;
+            if (!$agencyId) {
+                return response()->json(['message' => '소속된 대행사 정보를 찾을 수 없습니다.'], 403);
+            }
+            
+            // 대행사 멤버는 자신의 대행사 프로젝트/공고 스케줄만 조회
+            $query->where(function($q) use ($agencyId) {
+                $q->where(function($subQ) use ($agencyId) {
+                    $subQ->where('schedulable_type', 'App\\Models\\Project')
+                         ->whereHas('schedulable', function($projectQ) use ($agencyId) {
+                             $projectQ->where('agency_id', $agencyId);
+                         });
+                })->orWhere(function($subQ) use ($agencyId) {
+                    $subQ->where('schedulable_type', 'App\\Models\\Announcement')
+                         ->whereHas('schedulable', function($announcementQ) use ($agencyId) {
+                             $announcementQ->where('agency_id', $agencyId);
+                         });
                 });
             });
-        } elseif ($user->user_type === 'vendor_member') {
-            $userVendorId = $user->vendor_members->first()->vendor_id ?? null;
-            if (!$userVendorId) {
-                return response()->json(['message' => '소속 용역사 정보를 찾을 수 없습니다.'], 403);
-            }
-
-            // 용역사 멤버는 자신의 용역사와 관련된 스케줄만 조회
-            $query->whereHasMorph('schedulable', ['App\\Models\\Contract'], function ($subQuery) use ($userVendorId) {
-                $subQuery->whereHas('proposal', function ($proposalQuery) use ($userVendorId) {
-                    $proposalQuery->where('vendor_id', $userVendorId);
-                });
-            });
-        }
-        // admin은 모든 스케줄 조회 가능
-
-        // 내 일정만 조회 필터
-        if ($request->query('my_schedules_only', false)) {
-            // 현재 사용자가 관련된 스케줄만 조회 (구체적인 로직은 비즈니스 요구사항에 따라 조정)
-            // 예: 사용자가 담당자로 지정된 프로젝트/공고/계약의 스케줄
+        } else {
+            return response()->json(['message' => '스케줄을 조회할 권한이 없습니다.'], 403);
         }
 
-        // 스케줄 타입 필터
-        if ($request->has('schedulable_type')) {
-            $query->where('schedulable_type', $request->schedulable_type);
-        }
-
-        // 스케줄 대상 ID 필터
-        if ($request->has('schedulable_id')) {
-            $query->where('schedulable_id', $request->schedulable_id);
-        }
-
-        // 기간 필터
-        if ($request->has('start_date')) {
-            $startDate = $request->start_date . ' 00:00:00';
-            $query->where('scheduled_at', '>=', $startDate);
-        }
-
-        if ($request->has('end_date')) {
-            $endDate = $request->end_date . ' 23:59:59';
-            $query->where('scheduled_at', '<=', $endDate);
-        }
-
-        // 활동 타입 필터
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
-
-        // 관련 모델과 함께 로드
-        $schedules = $query->with(['schedulable', 'attachments'])
-                          ->orderBy('scheduled_at', 'asc')
-                          ->get();
-
-        // 응답 데이터 포맷팅
-        $formattedSchedules = $schedules->map(function ($schedule) {
-            return [
-                'id' => $schedule->id,
-                'title' => $schedule->title,
-                'description' => $schedule->description,
-                'scheduled_at' => $schedule->scheduled_at,
-                'type' => $schedule->type,
-                'status' => $schedule->status,
-                'schedulable_type' => $schedule->schedulable_type,
-                'schedulable_id' => $schedule->schedulable_id,
-                'schedulable' => $schedule->schedulable,
-                'attachments_count' => $schedule->attachments->count(),
-                'created_at' => $schedule->created_at,
-                'updated_at' => $schedule->updated_at
-            ];
-        });
+        $schedules = $query->with('schedulable')
+                          ->orderBy('start_datetime', 'asc')
+                          ->paginate(20);
 
         return response()->json([
             'message' => '스케줄 목록을 성공적으로 불러왔습니다.',
-            'schedules' => $formattedSchedules,
-            'total_count' => $formattedSchedules->count()
-        ]);
+            'schedules' => $schedules,
+        ], 200);
     }
 
     /**
@@ -459,157 +388,5 @@ class ScheduleController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-    }
-
-    /**
-     * 내 일정 조회 (GET /api/my-schedules)
-     *
-     * @OA\Get(
-     *     path="/api/my-schedules",
-     *     tags={"Schedule Management"},
-     *     summary="내 일정 조회",
-     *     description="현재 사용자와 관련된 모든 일정을 조회합니다. 대시보드에서 활용됩니다.",
-     *     security={{"sanctum": {}}},
-     *     @OA\Parameter(
-     *         name="start_date",
-     *         in="query",
-     *         description="조회 시작 날짜 (YYYY-MM-DD)",
-     *         @OA\Schema(type="string", format="date", example="2024-01-01")
-     *     ),
-     *     @OA\Parameter(
-     *         name="end_date",
-     *         in="query",
-     *         description="조회 종료 날짜 (YYYY-MM-DD)",
-     *         @OA\Schema(type="string", format="date", example="2024-01-31")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="내 일정 조회 성공",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="내 일정을 성공적으로 불러왔습니다."),
-     *             @OA\Property(
-     *                 property="schedules",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="string"),
-     *                     @OA\Property(property="title", type="string"),
-     *                     @OA\Property(property="scheduled_at", type="string", format="date-time"),
-     *                     @OA\Property(property="type", type="string"),
-     *                     @OA\Property(property="status", type="string"),
-     *                     @OA\Property(property="related_project", type="string", description="관련 프로젝트명"),
-     *                     @OA\Property(property="my_role", type="string", description="나의 역할")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=403, description="권한 없음")
-     * )
-     */
-    public function mySchedules(Request $request)
-    {
-        $user = Auth::user();
-        $query = Schedule::query();
-
-        // 사용자 타입별 내 일정 조회 로직
-        if ($user->user_type === 'agency_member') {
-            $userAgencyId = $user->agency_members->first()->agency_id ?? null;
-            if (!$userAgencyId) {
-                return response()->json(['message' => '소속 대행사 정보를 찾을 수 없습니다.'], 403);
-            }
-
-            // 내가 담당자로 지정된 프로젝트의 스케줄
-            $query->where(function ($q) use ($user, $userAgencyId) {
-                // 내가 주담당자 또는 부담당자인 프로젝트
-                $q->whereHasMorph('schedulable', ['App\\Models\\Project'], function ($subQuery) use ($user) {
-                    $subQuery->where(function ($projectQuery) use ($user) {
-                        $projectQuery->where('main_agency_contact_user_id', $user->id)
-                                   ->orWhere('sub_agency_contact_user_id', $user->id);
-                    });
-                })
-                // 내가 심사위원으로 배정된 공고
-                ->orWhereHasMorph('schedulable', ['App\\Models\\Announcement'], function ($subQuery) use ($user) {
-                    $subQuery->whereHas('evaluators', function ($evaluatorQuery) use ($user) {
-                        $evaluatorQuery->where('evaluator_user_id', $user->id);
-                    });
-                })
-                // 내가 관련된 계약
-                ->orWhereHasMorph('schedulable', ['App\\Models\\Contract'], function ($subQuery) use ($userAgencyId) {
-                    $subQuery->whereHas('proposal.announcement', function ($announcementQuery) use ($userAgencyId) {
-                        $announcementQuery->where('agency_id', $userAgencyId);
-                    });
-                });
-            });
-
-        } elseif ($user->user_type === 'vendor_member') {
-            $userVendorId = $user->vendor_members->first()->vendor_id ?? null;
-            if (!$userVendorId) {
-                return response()->json(['message' => '소속 용역사 정보를 찾을 수 없습니다.'], 403);
-            }
-
-            // 내 용역사의 제안서/계약 관련 스케줄
-            $query->whereHasMorph('schedulable', ['App\\Models\\Contract'], function ($subQuery) use ($userVendorId) {
-                $subQuery->whereHas('proposal', function ($proposalQuery) use ($userVendorId) {
-                    $proposalQuery->where('vendor_id', $userVendorId);
-                });
-            });
-        }
-
-        // 기간 필터
-        if ($request->has('start_date')) {
-            $startDate = $request->start_date . ' 00:00:00';
-            $query->where('scheduled_at', '>=', $startDate);
-        }
-
-        if ($request->has('end_date')) {
-            $endDate = $request->end_date . ' 23:59:59';
-            $query->where('scheduled_at', '<=', $endDate);
-        }
-
-        $schedules = $query->with(['schedulable'])
-                          ->orderBy('scheduled_at', 'asc')
-                          ->get();
-
-        // 응답 데이터 포맷팅 (내 역할 정보 포함)
-        $formattedSchedules = $schedules->map(function ($schedule) use ($user) {
-            $relatedProject = null;
-            $myRole = null;
-
-            if ($schedule->schedulable_type === 'App\\Models\\Project') {
-                $project = $schedule->schedulable;
-                $relatedProject = $project->project_name;
-                if ($project->main_agency_contact_user_id === $user->id) {
-                    $myRole = '주담당자';
-                } elseif ($project->sub_agency_contact_user_id === $user->id) {
-                    $myRole = '부담당자';
-                }
-            } elseif ($schedule->schedulable_type === 'App\\Models\\Announcement') {
-                $announcement = $schedule->schedulable;
-                $relatedProject = $announcement->rfp->project->project_name ?? '알 수 없음';
-                $myRole = '심사위원';
-            } elseif ($schedule->schedulable_type === 'App\\Models\\Contract') {
-                $contract = $schedule->schedulable;
-                $relatedProject = $contract->proposal->announcement->rfp->project->project_name ?? '알 수 없음';
-                $myRole = $user->user_type === 'agency_member' ? '대행사 담당자' : '용역사 담당자';
-            }
-
-            return [
-                'id' => $schedule->id,
-                'title' => $schedule->title,
-                'description' => $schedule->description,
-                'scheduled_at' => $schedule->scheduled_at,
-                'type' => $schedule->type,
-                'status' => $schedule->status,
-                'related_project' => $relatedProject,
-                'my_role' => $myRole,
-                'schedulable_type' => $schedule->schedulable_type,
-                'schedulable_id' => $schedule->schedulable_id
-            ];
-        });
-
-        return response()->json([
-            'message' => '내 일정을 성공적으로 불러왔습니다.',
-            'schedules' => $formattedSchedules,
-            'total_count' => $formattedSchedules->count()
-        ]);
     }
 }

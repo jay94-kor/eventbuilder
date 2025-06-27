@@ -21,9 +21,6 @@ class Contract extends Model
         'prepayment_amount',
         'balance_amount',
         'payment_status',
-        'proposed_meeting_dates',
-        'selected_meeting_date',
-        'meeting_status',
     ];
 
     protected $casts = [
@@ -31,8 +28,6 @@ class Contract extends Model
         'prepayment_amount' => 'decimal:2',
         'balance_amount' => 'decimal:2',
         'contract_signed_at' => 'datetime',
-        'proposed_meeting_dates' => 'array',
-        'selected_meeting_date' => 'datetime',
     ];
 
     /**
