@@ -20,11 +20,17 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      console.log('🚀 로그인 시도:', { email, password: '***' });
       const response = await api.post('/api/login', { email, password });
+      console.log('📨 로그인 응답:', response.data);
+      
       const { user, token, message } = response.data;
+      console.log('🎫 받은 토큰:', token ? '토큰 있음' : '토큰 없음');
+      console.log('👤 받은 사용자:', user);
       
       setAuth(token, user);
-      console.log('로그인 성공:', message);
+      console.log('💾 토큰 저장 후 localStorage 확인:', localStorage.getItem('bidly_token'));
+      console.log('✅ 로그인 성공:', message);
       
       // 사용자 타입에 따라 적절한 대시보드로 리다이렉트
       switch (user.user_type) {

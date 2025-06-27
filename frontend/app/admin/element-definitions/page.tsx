@@ -6,16 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 
 interface ElementDefinition {
   id: string;
   element_type: string;
+  display_name: string;
   description: string;
-  is_active: boolean;
+  input_schema?: any;
+  default_details_template?: any;
+  recommended_elements?: any;
   created_at: string;
   updated_at: string;
 }
@@ -27,8 +28,8 @@ export default function ElementDefinitionsPage() {
   const [currentElement, setCurrentElement] = useState<ElementDefinition | null>(null);
   const [formData, setFormData] = useState({
     element_type: '',
+    display_name: '',
     description: '',
-    is_active: true,
   });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,11 +38,17 @@ export default function ElementDefinitionsPage() {
   const fetchElements = async () => {
     try {
       setIsLoading(true);
+      console.log('API 호출 시작...');
       const response = await api.get('/api/element-definitions');
-      setElements(response.data);
+      console.log('API 응답:', response.data);
+      
+      // 백엔드에서 response.data.elements로 응답함
+      const elementsData = response.data.elements || response.data;
+      console.log('요소 데이터:', elementsData);
+      setElements(elementsData);
     } catch (err: any) {
       console.error('요소 정의 조회 실패:', err);
-      setError('요소 정의를 불러오는데 실패했습니다.');
+      setError('요소 정의를 불러오는데 실패했습니다: ' + (err.response?.data?.message || err.message));
     } finally {
       setIsLoading(false);
     }
@@ -52,25 +59,34 @@ export default function ElementDefinitionsPage() {
   }, []);
 
   const handleOpenModal = (element?: ElementDefinition) => {
+    console.log('수정 버튼 클릭됨, 요소:', element);
+    
     if (element) {
       setCurrentElement(element);
       setFormData({
         element_type: element.element_type,
-        description: element.description,
-        is_active: element.is_active,
+        display_name: element.display_name,
+        description: element.description || '',
+      });
+      console.log('수정 모드 - 폼 데이터 설정됨:', {
+        element_type: element.element_type,
+        display_name: element.display_name,
+        description: element.description || '',
       });
     } else {
       setCurrentElement(null);
-      setFormData({ element_type: '', description: '', is_active: true });
+      setFormData({ element_type: '', display_name: '', description: '' });
+      console.log('추가 모드 - 폼 데이터 초기화됨');
     }
     setError(null);
     setIsModalOpen(true);
+    console.log('모달 열기 설정됨');
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentElement(null);
-    setFormData({ element_type: '', description: '', is_active: true });
+    setFormData({ element_type: '', display_name: '', description: '' });
     setError(null);
   };
 
@@ -82,37 +98,29 @@ export default function ElementDefinitionsPage() {
     }));
   };
 
-  const handleSwitchChange = (checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      is_active: checked,
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
     try {
-      const { element_type, description, is_active } = formData;
+      const { element_type, display_name, description } = formData;
       
-      if (!element_type.trim() || !description.trim()) {
-        setError('요소 타입과 설명을 모두 입력해주세요.');
+      if (!element_type.trim() || !display_name.trim()) {
+        setError('요소 타입과 표시 이름을 모두 입력해주세요.');
         return;
       }
 
       if (currentElement) {
         await api.put(`/api/element-definitions/${currentElement.id}`, {
-          element_type,
+          display_name,
           description,
-          is_active,
         });
       } else {
         await api.post('/api/element-definitions', {
           element_type,
+          display_name,
           description,
-          is_active,
         });
       }
 
@@ -167,8 +175,8 @@ export default function ElementDefinitionsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>요소 타입</TableHead>
+                <TableHead>표시 이름</TableHead>
                 <TableHead>설명</TableHead>
-                <TableHead>활성화</TableHead>
                 <TableHead>생성일</TableHead>
                 <TableHead className="text-right">액션</TableHead>
               </TableRow>
@@ -177,30 +185,32 @@ export default function ElementDefinitionsPage() {
               {elements.map((element) => (
                 <TableRow key={element.id}>
                   <TableCell className="font-medium">{element.element_type}</TableCell>
+                  <TableCell>{element.display_name}</TableCell>
                   <TableCell>{element.description}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      element.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {element.is_active ? '활성' : '비활성'}
-                    </span>
-                  </TableCell>
                   <TableCell>{new Date(element.created_at).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="outline"
                       size="sm"
                       className="mr-2"
-                      onClick={() => handleOpenModal(element)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('수정 버튼 클릭 이벤트 발생, 요소 ID:', element.id);
+                        handleOpenModal(element);
+                      }}
                     >
                       수정
                     </Button>
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(element.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('삭제 버튼 클릭 이벤트 발생, 요소 ID:', element.id);
+                        handleDelete(element.id);
+                      }}
                     >
                       삭제
                     </Button>
@@ -240,7 +250,22 @@ export default function ElementDefinitionsPage() {
                   value={formData.element_type}
                   onChange={handleChange}
                   className="col-span-3"
-                  placeholder="예: 무대설치, 음향장비, 조명장비"
+                  placeholder="예: stage, sound, lighting"
+                  disabled={!!currentElement} // 수정 시에는 element_type 변경 불가
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="display_name" className="text-right">
+                  표시 이름
+                </Label>
+                <Input
+                  id="display_name"
+                  value={formData.display_name}
+                  onChange={handleChange}
+                  className="col-span-3"
+                  placeholder="예: 무대, 음향, 조명"
                   required
                 />
               </div>
@@ -256,24 +281,7 @@ export default function ElementDefinitionsPage() {
                   className="col-span-3"
                   placeholder="요소에 대한 상세 설명을 입력하세요"
                   rows={3}
-                  required
                 />
-              </div>
-              
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="is_active" className="text-right">
-                  활성화
-                </Label>
-                <div className="col-span-3 flex items-center space-x-2">
-                  <Switch
-                    id="is_active"
-                    checked={formData.is_active}
-                    onCheckedChange={handleSwitchChange}
-                  />
-                  <span className="text-sm text-gray-600">
-                    {formData.is_active ? '활성' : '비활성'}
-                  </span>
-                </div>
               </div>
             </div>
             

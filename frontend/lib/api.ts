@@ -21,13 +21,20 @@ api.interceptors.request.use(
     // 클라이언트 사이드에서만 localStorage에 접근하도록 확인
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('bidly_token'); // 저장된 토큰 이름에 맞게 수정
+      console.log('🔑 API 요청 시 토큰:', token ? '토큰 있음' : '토큰 없음');
+      console.log('📍 요청 URL:', config.url);
+      
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('✅ Authorization 헤더 추가됨');
+      } else {
+        console.warn('⚠️ 토큰이 없어 Authorization 헤더를 추가하지 않음');
       }
     }
     return config;
   },
   (error) => {
+    console.error('❌ API 요청 인터셉터 에러:', error);
     return Promise.reject(error);
   }
 );

@@ -45,20 +45,30 @@ const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   initializeAuth: () => {
+    console.log('🔄 인증 초기화 시작...');
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('bidly_token');
       const userStr = localStorage.getItem('bidly_user');
+      console.log('🔍 localStorage 확인:', { 
+        token: token ? '토큰 있음' : '토큰 없음', 
+        user: userStr ? '사용자 정보 있음' : '사용자 정보 없음' 
+      });
+      
       if (token && userStr) {
         try {
           const user: User = JSON.parse(userStr);
+          console.log('✅ 인증 정보 복구 성공:', { user: user.email, user_type: user.user_type });
           set({ token, user, isAuthenticated: true });
         } catch (e) {
-          console.error("Failed to parse user from localStorage", e);
+          console.error("❌ 사용자 정보 파싱 실패:", e);
           get().clearAuth(); // 파싱 실패 시 인증 정보 초기화
         }
       } else {
+        console.log('⚠️ 저장된 인증 정보 없음 - 로그아웃 상태로 설정');
         get().clearAuth(); // 토큰이 없으면 인증 정보 초기화
       }
+    } else {
+      console.log('🚫 서버 사이드 렌더링 중 - localStorage 접근 불가');
     }
   },
 }));
