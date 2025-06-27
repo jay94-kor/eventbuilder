@@ -169,6 +169,11 @@ coverage/
 htmlcov/
 
 # ===================================================================
+# NODE_MODULES
+# ===================================================================
+node_modules/
+
+# ===================================================================
 # NOTE: Backend and frontend subdirectories have their own
 # specialized .gitignore files for Laravel and Next.js respectively
 # =================================================================== 
