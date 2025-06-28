@@ -89,7 +89,7 @@ export default function AgencyDashboard() {
                 <p className="text-blue-100 mb-4">행사를 위한 새로운 제안요청서를 작성합니다.</p>
                 <Link href="/agency/rfps/create">
                   <Button className="bg-white text-blue-600 hover:bg-gray-100 font-medium">
-                    지금 시작하기 →
+                    {'지금 시작하기 →'}
                   </Button>
                 </Link>
               </div>
@@ -107,7 +107,7 @@ export default function AgencyDashboard() {
                 <p className="text-green-100 mb-4">기존 RFP들을 확인하고 관리합니다.</p>
                 <Link href="/agency/rfps">
                   <Button className="bg-white text-green-600 hover:bg-gray-100 font-medium">
-                    목록 보기 →
+                    {'목록 보기 →'}
                   </Button>
                 </Link>
               </div>
@@ -124,7 +124,7 @@ export default function AgencyDashboard() {
           <div className="space-y-3">
             <div className="flex items-center text-sm">
               <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-              <span className="text-gray-600">새로운 RFP "2024 IT 컨퍼런스"가 생성되었습니다.</span>
+              <span className="text-gray-600">새로운 RFP &quot;2024 IT 컨퍼런스&quot;가 생성되었습니다.</span>
               <span className="ml-auto text-gray-400">2시간 전</span>
             </div>
             <div className="flex items-center text-sm">

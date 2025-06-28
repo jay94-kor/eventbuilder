@@ -2,13 +2,13 @@
 
 'use client'; // 클라이언트 컴포넌트로 지정
 
-import { useEffect, useRef } from 'react'; // useRef 임포트
+import { useEffect, useRef, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import useAuthStore from '../lib/stores/authStore'; // authStore 임포트
 import api from '../lib/api'; // api 인스턴스 임포트
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const publicPaths = ['/login']; // 인증이 필요 없는 경로
@@ -16,32 +16,22 @@ const publicPaths = ['/login']; // 인증이 필요 없는 경로
 export default function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, initializeAuth, clearAuth, user } = useAuthStore();
-
-  // useRef를 사용하여 응답 인터셉터 ID를 저장
-  const interceptorIds = useRef<{ response?: number }>({});
+  const { isAuthenticated, initializeAuth, user } = useAuthStore();
+  const interceptorId = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    initializeAuth(); // 앱 로드 시 로컬 스토리지에서 인증 정보 초기화
-  }, [initializeAuth]);
+    initializeAuth();
 
-  // 401 에러 처리용 응답 인터셉터만 등록 (요청 인터셉터는 lib/api.ts에서 이미 처리)
-  useEffect(() => {
-    // 이전 응답 인터셉터가 있다면 제거
-    if (interceptorIds.current.response !== undefined) {
-      api.interceptors.response.eject(interceptorIds.current.response);
+    const currentInterceptorId = interceptorId.current;
+    if (currentInterceptorId !== undefined) {
+      api.interceptors.response.eject(currentInterceptorId);
     }
 
-    // 응답 인터셉터만 등록 (401 에러 처리용)
-    const responseInterceptorId = api.interceptors.response.use(
+    const newInterceptorId = api.interceptors.response.use(
       (response) => response,
-      (error) => {
-        if (error.response && error.response.status === 401) {
-          console.error('🚫 인증 실패: 401 Unauthorized. 로그아웃 처리 및 로그인 페이지로 리다이렉트합니다.');
-          clearAuth(); // Zustand 스토어 초기화
-          if (pathname !== '/login') { // 이미 로그인 페이지가 아니라면 리다이렉트
-            router.replace('/login');
-          }
+      async (error) => {
+        if (error.response?.status === 401) {
+          useAuthStore.getState().clearAuth();
         } else if (error.response && error.response.status === 403) {
           console.error('🚫 권한 없음: 403 Forbidden. 접근 권한이 없습니다.');
           // TODO: 403 페이지 또는 권한 없음 메시지 표시 (향후 구현)
@@ -50,16 +40,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         return Promise.reject(error);
       }
     );
-    interceptorIds.current.response = responseInterceptorId; // ID 저장
+    
+    interceptorId.current = newInterceptorId;
 
-    // 컴포넌트 언마운트 또는 useEffect 재실행 시 인터셉터 제거
     return () => {
-      if (interceptorIds.current.response !== undefined) {
-        api.interceptors.response.eject(interceptorIds.current.response);
-        interceptorIds.current.response = undefined; // ID 초기화
-      }
+      api.interceptors.response.eject(newInterceptorId);
     };
-  }, [clearAuth, pathname, router]); // 의존성 배열 유지
+  }, [initializeAuth]);
 
   // 인증 상태에 따른 라우팅 처리
   useEffect(() => {

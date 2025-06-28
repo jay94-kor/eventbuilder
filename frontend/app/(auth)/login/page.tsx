@@ -46,9 +46,10 @@ export default function LoginPage() {
         default:
           router.push('/');
       }
-    } catch (err: any) {
-      console.error('로그인 실패:', err.response?.data || err.message);
-      setError(err.response?.data?.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+    } catch (err) {
+      const error = err as Error;
+      console.error('로그인 실패:', error);
+      setError(error.message || '로그인 중 에러가 발생했습니다.');
     }
   };
 
