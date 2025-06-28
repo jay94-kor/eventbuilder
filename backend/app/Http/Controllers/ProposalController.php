@@ -10,9 +10,17 @@ use App\Models\Contract;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Services\NotificationService;
 
 class ProposalController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * 특정 공고에 제안서 제출 (POST /api/announcements/{announcement}/proposals)
      *
@@ -114,7 +122,15 @@ class ProposalController extends Controller
                 'status' => 'submitted', // 초기 상태는 'submitted'
             ]);
 
-            // (선택 사항) 대행사 담당자에게 제안서 제출 알림 로직 추가
+            // 7. 대행사 담당자에게 제안서 제출 알림 발송
+            $agencyMasterUser = $announcement->agency->masterUser;
+            if ($agencyMasterUser) {
+                $this->notificationService->notifyProposalSubmitted(
+                    $agencyMasterUser, 
+                    $proposal, 
+                    $announcement
+                );
+            }
 
             DB::commit();
             return response()->json([
@@ -335,6 +351,34 @@ class ProposalController extends Controller
             // 8. 공고 상태를 'closed'로 변경 (더 이상 제안서 받지 않음)
             $proposal->announcement->status = 'closed';
             $proposal->announcement->save();
+
+            // 9. 낙찰된 용역사에게 알림 발송
+            $winnerVendorUser = $proposal->vendor->masterUser;
+            if ($winnerVendorUser) {
+                $this->notificationService->notifyProposalAwarded(
+                    $winnerVendorUser, 
+                    $proposal, 
+                    $proposal->announcement
+                );
+            }
+
+            // 10. 유찰된 용역사들에게 알림 발송
+            $rejectedProposals = $proposal->announcement->proposals()
+                                          ->where('id', '!=', $proposal->id)
+                                          ->where('status', 'rejected')
+                                          ->with('vendor.masterUser')
+                                          ->get();
+
+            foreach ($rejectedProposals as $rejectedProposal) {
+                $rejectedVendorUser = $rejectedProposal->vendor->masterUser;
+                if ($rejectedVendorUser) {
+                    $this->notificationService->notifyProposalRejected(
+                        $rejectedVendorUser, 
+                        $rejectedProposal, 
+                        $proposal->announcement
+                    );
+                }
+            }
 
             DB::commit();
             return response()->json([

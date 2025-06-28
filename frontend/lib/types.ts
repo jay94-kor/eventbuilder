@@ -10,11 +10,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  phone_number?: string;
-  user_type: UserType;
-  email_verified_at?: string;
-  created_at?: string;
-  updated_at?: string;
+  user_type: string;
 }
 
 export interface Agency {
@@ -47,6 +43,8 @@ export interface ElementDefinition {
   element_type: string;
   display_name: string;
   description?: string;
+  category?: string;
+  is_active: boolean;
   input_schema?: Record<string, unknown>;
   default_details_template?: Record<string, unknown>;
   recommended_elements?: string[];
@@ -61,24 +59,21 @@ export interface ElementDefinition {
 export interface Project {
   id: string;
   project_name: string;
-  start_datetime?: string;
-  end_datetime?: string;
-  preparation_start_datetime?: string;
-  철수_end_datetime?: string;
+  start_datetime: string;
+  end_datetime: string;
+  preparation_start_datetime?: string | null;
+  철수_end_datetime?: string | null;
   client_name: string;
-  client_contact_person?: string;
-  client_contact_number?: string;
-  main_agency_contact_user_id?: string;
-  sub_agency_contact_user_id?: string;
+  client_contact_person: string;
+  client_contact_number: string;
+  main_agency_contact_user_id: string;
+  sub_agency_contact_user_id?: string | null;
   agency_id: string;
-  is_indoor?: boolean;
-  location?: string;
-  budget_including_vat?: number;
-  created_at?: string;
-  updated_at?: string;
-  agency?: Agency;
-  mainAgencyContactUser?: User;
-  subAgencyContactUser?: User;
+  is_indoor: boolean;
+  location: string;
+  budget_including_vat: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export type RfpStatus = 'draft' | 'approval_pending' | 'approved' | 'rejected' | 'published' | 'closed';
@@ -88,31 +83,33 @@ export interface RfpElement {
   id: string;
   rfp_id: string;
   element_type: string;
-  details: Record<string, unknown>;
-  allocated_budget?: number;
-  prepayment_ratio?: number;
-  prepayment_due_date?: string;
-  balance_ratio?: number;
-  balance_due_date?: string;
-  created_at?: string;
-  updated_at?: string;
+  details: Record<string, any>;
+  allocated_budget: string;
+  prepayment_ratio: string;
+  prepayment_due_date: string;
+  balance_ratio: string;
+  balance_due_date: string;
+  parent_rfp_element_id?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Rfp {
   id: string;
   project_id: string;
-  current_status: RfpStatus;
+  current_status: string;
   created_by_user_id: string;
   agency_id: string;
-  issue_type: IssueType;
-  rfp_description?: string;
-  closing_at?: string;
-  published_at?: string;
-  created_at?: string;
-  updated_at?: string;
+  issue_type: string;
+  rfp_description: string;
+  closing_at: string;
+  published_at?: string | null;
+  created_at: string;
+  updated_at: string;
+  is_client_name_public: boolean;
+  is_budget_public: boolean;
   project?: Project;
   elements?: RfpElement[];
-  agency?: Agency;
 }
 
 // =================================
@@ -275,25 +272,26 @@ export interface EvaluationStepFormData {
 
 export interface RfpFormData {
   project_name: string;
-  start_datetime: Date | null;
-  end_datetime: Date | null;
-  preparation_start_datetime: Date | null;
-  철수_end_datetime: Date | null;
+  start_datetime: string;
+  end_datetime: string;
   client_name: string;
   client_contact_person: string;
   client_contact_number: string;
-  is_client_name_public: boolean;
-  is_budget_public: boolean;
   is_indoor: boolean;
   location: string;
-  budget_including_vat: number | null;
+  budget_including_vat: number;
+  issue_type: 'integrated' | 'separated_by_element' | 'separated_by_group';
   rfp_description: string;
-  closing_at: Date | null;
-  main_agency_contact_user_id: string | null;
-  sub_agency_contact_user_id: string | null;
-  selected_element_definitions: ElementDefinition[];
-  elements: RfpElementFormData[];
-  issue_type: IssueType;
+  closing_at: string;
+  elements: Array<{
+    element_type: string;
+    details: Record<string, any>;
+    allocated_budget: number;
+    prepayment_ratio: number;
+    prepayment_due_date: string;
+    balance_ratio: number;
+    balance_due_date: string;
+  }>;
   evaluation_steps: EvaluationStepFormData[];
 }
 
@@ -301,10 +299,9 @@ export interface RfpFormData {
 //  API Related
 // =================================
 
-export interface ApiResponse<T = unknown> {
-  message?: string;
+export interface ApiResponse<T> {
+  message: string;
   data?: T;
-  errors?: Record<string, string[]>;
 }
 
 export interface PaginatedResponse<T = unknown> {
@@ -319,6 +316,34 @@ export interface LoginResponse {
   user: User;
   token: string;
   message: string;
+}
+
+export interface RfpListResponse {
+  message: string;
+  rfps: {
+    current_page: number;
+    data: Rfp[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
+}
+
+export interface RfpCreateResponse {
+  message: string;
+  rfp: Rfp;
 }
 
 // =================================

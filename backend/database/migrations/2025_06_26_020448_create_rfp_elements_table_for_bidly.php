@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('rfp_elements', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('uuid_generate_v4()'));
             $table->uuid('rfp_id')->comment('연결된 RFP ID (FK)');
-            $table->string('element_type')->comment('요소 타입 (RFP_ELEMENT_TYPE_ENUM)'); // STRING으로 선언
+            $table->string('element_type', 100)->comment('요소 타입 (VARCHAR 100)'); // VARCHAR로 선언
             $table->jsonb('details')->nullable()->comment('각 요소별 상세 스펙 (JSONB)');
             $table->decimal('allocated_budget', 15, 2)->nullable()->comment('이 요소에 배정된 예산');
             $table->decimal('prepayment_ratio', 5, 2)->nullable()->comment('선금 비율 (0~1 사이 값)');
@@ -33,8 +33,7 @@ return new class extends Migration
             $table->foreign('parent_rfp_element_id')->references('id')->on('rfp_elements')->onDelete('set null');
         });
 
-        // ENUM 타입으로 컬럼 변경
-        DB::statement("ALTER TABLE rfp_elements ALTER COLUMN element_type TYPE RFP_ELEMENT_TYPE_ENUM USING element_type::RFP_ELEMENT_TYPE_ENUM");
+        // VARCHAR로 유지 (ENUM 사용하지 않음)
         DB::statement("COMMENT ON TABLE rfp_elements IS '각 RFP에 포함된 요소(무대, 음향 등)의 상세 정보를 저장하는 테이블'");
     }
 

@@ -1,43 +1,45 @@
 import { useState } from 'react';
-import { 
-  RfpFormData, 
-  ElementDefinition, 
-  RfpElementFormData, 
-  UseRfpFormReturn 
-} from '../lib/types';
+import { RfpFormData, EvaluationStepFormData } from '../lib/types';
 import useAuthStore from '../lib/stores/authStore';
 
-export const useRfpForm = (): UseRfpFormReturn => {
+export const useRfpForm = () => {
   const { user } = useAuthStore();
-  const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<RfpFormData>({
     project_name: '',
-    start_datetime: null,
-    end_datetime: null,
-    preparation_start_datetime: null,
-    철수_end_datetime: null,
+    start_datetime: '',
+    end_datetime: '',
     client_name: '',
     client_contact_person: '',
     client_contact_number: '',
-    is_client_name_public: true,
-    is_budget_public: false,
     is_indoor: true,
     location: '',
-    budget_including_vat: null,
-    rfp_description: '',
-    closing_at: null,
-    main_agency_contact_user_id: user?.id || null,
-    sub_agency_contact_user_id: null,
-    selected_element_definitions: [],
-    elements: [],
+    budget_including_vat: 0,
     issue_type: 'integrated',
-    evaluation_steps: [],
+    rfp_description: '',
+    closing_at: '',
+    elements: [{
+      element_type: 'stage',
+      details: { description: '기본 무대 설치' },
+      allocated_budget: 1000000,
+      prepayment_ratio: 0.3,
+      prepayment_due_date: '',
+      balance_ratio: 0.7,
+      balance_due_date: '',
+    }],
+    evaluation_steps: [{
+      step_name: '서류 심사',
+      start_date: null,
+      end_date: null,
+      send_notification: true,
+    }],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { id, value, type, checked } = e.target as HTMLInputElement;
+    const { id, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
     setFormData((prev: RfpFormData) => ({
       ...prev,
       [id]: type === 'checkbox' ? checked : value,
@@ -54,71 +56,24 @@ export const useRfpForm = (): UseRfpFormReturn => {
   const handleDateChange = (id: string, date: Date | undefined) => {
     setFormData((prev: RfpFormData) => ({
       ...prev,
-      [id]: date || null,
+      [id]: date ? date.toISOString().split('T')[0] : '',
     }));
   };
 
   const handleNumericChange = (id: string, value: string) => {
     setFormData((prev: RfpFormData) => ({
       ...prev,
-      [id]: value === '' ? null : Number(value),
+      [id]: value === '' ? 0 : Number(value),
     }));
   };
 
-  const handleElementSelect = (element: ElementDefinition, isChecked: boolean) => {
-    setFormData((prev: RfpFormData) => {
-      const newSelectedElements = isChecked
-        ? [...prev.selected_element_definitions, element]
-        : prev.selected_element_definitions.filter((e: ElementDefinition) => e.id !== element.id);
-      
-      const newElementsFormData = newSelectedElements.map((selectedElem: ElementDefinition) => {
-        const existingElementData = prev.elements.find((e: RfpElementFormData) => e.element_id === selectedElem.id);
-        return existingElementData || {
-          element_id: selectedElem.id,
-          element_type: selectedElem.element_type,
-          details: {},
-          allocated_budget: null,
-          prepayment_ratio: null,
-          prepayment_due_date: null,
-          balance_ratio: null,
-          balance_due_date: null,
-        };
-      });
-
-      return {
-        ...prev,
-        selected_element_definitions: newSelectedElements,
-        elements: newElementsFormData,
-      };
-    });
-  };
-
-  const handleElementDetailsChange = (
-    elementId: string, 
-    field: keyof RfpElementFormData, 
-    value: any
-  ) => {
+  const handleElementUpdate = (elementIndex: number, field: string, value: any) => {
     setFormData((prev: RfpFormData) => ({
       ...prev,
-      elements: prev.elements.map((el: RfpElementFormData) => 
-        el.element_id === elementId 
-          ? { ...el, [field]: value } 
-          : el
-      )
-    }));
-  };
-
-  const handleElementSpecificDetailsChange = (
-    elementId: string, 
-    detailField: string, 
-    value: string
-  ) => {
-    setFormData((prev: RfpFormData) => ({
-      ...prev,
-      elements: prev.elements.map((el: RfpElementFormData) => 
-        el.element_id === elementId 
-          ? { ...el, details: { ...el.details, [detailField]: value } } 
-          : el
+      elements: prev.elements.map((element, index) => 
+        index === elementIndex 
+          ? { ...element, [field]: value }
+          : element
       )
     }));
   };
@@ -128,29 +83,30 @@ export const useRfpForm = (): UseRfpFormReturn => {
     field: 'step_name' | 'start_date' | 'end_date' | 'send_notification',
     value: string | Date | boolean | null
   ) => {
-    setFormData((prev: RfpFormData) => {
-      const newSteps = [...prev.evaluation_steps];
-      if (field === 'start_date' || field === 'end_date') {
-        newSteps[index][field] = value as Date | null;
-      } else if (field === 'send_notification') {
-        newSteps[index][field] = value as boolean;
-      } else { // step_name
-        newSteps[index][field] = value as string;
-      }
-      return { ...prev, evaluation_steps: newSteps };
-    });
+    setFormData((prev: RfpFormData) => ({
+      ...prev,
+      evaluation_steps: prev.evaluation_steps.map((step, i) =>
+        i === index ? { ...step, [field]: value } : step
+      )
+    }));
   };
 
   const addEvaluationStep = () => {
-    setFormData((prev: RfpFormData) => ({ 
-      ...prev, 
-      evaluation_steps: [...prev.evaluation_steps, { step_name: '', start_date: null, end_date: null, send_notification: true }] 
+    setFormData((prev: RfpFormData) => ({
+      ...prev,
+      evaluation_steps: [
+        ...prev.evaluation_steps,
+        {
+          step_name: '',
+          start_date: null,
+          end_date: null,
+          send_notification: true,
+        }
+      ]
     }));
   };
 
   return {
-    step,
-    setStep,
     formData,
     setFormData,
     error,
@@ -159,9 +115,7 @@ export const useRfpForm = (): UseRfpFormReturn => {
     handleSwitchChange,
     handleDateChange,
     handleNumericChange,
-    handleElementSelect,
-    handleElementDetailsChange,
-    handleElementSpecificDetailsChange,
+    handleElementUpdate,
     handleEvaluationStepChange,
     addEvaluationStep,
   };

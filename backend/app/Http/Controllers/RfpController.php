@@ -103,7 +103,7 @@ class RfpController extends Controller
 
             // RFP 요소 (rfp_elements) 유효성 검사
             'elements' => 'required|array|min:1', // 최소 하나의 요소는 있어야 함
-            'elements.*.element_type' => 'required|string|exists:element_definitions,element_type', // element_type은 정의된 것만 허용
+            'elements.*.element_type' => 'required|string|max:100', // element_type은 VARCHAR(100)로 자유롭게 입력 가능
             'elements.*.details' => 'nullable|array', // JSONB 데이터는 배열 형태로 받음
             'elements.*.allocated_budget' => 'nullable|numeric|min:0',
             'elements.*.prepayment_ratio' => 'nullable|numeric|min:0|max:1',

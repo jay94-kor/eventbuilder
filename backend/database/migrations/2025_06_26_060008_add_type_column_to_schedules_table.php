@@ -12,13 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ENUM 타입 적용 (ENUM은 이미 첫 번째 마이그레이션에서 생성됨)
+        // VARCHAR 타입 적용
         Schema::table('schedules', function (Blueprint $table) {
-            $table->string('type')->nullable()->after('status')->comment('스케줄 활동 유형');
+            $table->string('type', 100)->nullable()->after('status')->comment('스케줄 활동 유형 (VARCHAR 100)');
         });
-
-        // ENUM 타입으로 변경
-        DB::statement("ALTER TABLE schedules ALTER COLUMN type TYPE SCHEDULE_ACTIVITY_TYPE_ENUM USING type::SCHEDULE_ACTIVITY_TYPE_ENUM");
         
         // 기존 데이터에 대해 기본값 설정 (선택사항)
         DB::statement("UPDATE schedules SET type = 'meeting' WHERE type IS NULL");
