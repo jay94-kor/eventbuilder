@@ -230,6 +230,7 @@ export default function CreateRfpPage() {
         {/* 단계별 폼 */}
         {renderStep()}
 
+<<<<<<< Updated upstream
         {/* 네비게이션 버튼 */}
         <div className="flex justify-between mt-8">
           <Button
@@ -245,6 +246,57 @@ export default function CreateRfpPage() {
               <Button onClick={nextStep}>
                 다음
               </Button>
+=======
+        {step === 1 && (
+          <Step1Form 
+          formData={formData} 
+            handleChange={handleFieldChange}
+          handleSwitchChange={handleSwitchChange} 
+            handleVenueTypeChange={handleVenueTypeChange}
+            handleDateChange={handleFieldDateChange} 
+            handleNumericChange={handleFieldNumericChange}
+            errorFields={errorFields}
+          />
+        )}
+
+        {step === 2 && (
+          <Step2Form
+            formData={formData}
+            setFormData={handleStep2FormDataChange}
+          />
+        )}
+
+        {step === 3 && (
+          <Step3Form
+            formData={formData}
+            selectedElementDefinitions={formData.selected_element_definitions}
+            rfpElements={formData.elements}
+            onRfpElementsChange={(elements) => setFormData({...formData, elements})}
+            onRemoveElement={(elementId) => {
+              setFormData({
+                ...formData,
+                selected_element_definitions: formData.selected_element_definitions.filter(e => e.id !== elementId),
+                elements: formData.elements.filter(e => e.element_id !== elementId),
+              });
+            }}
+          />
+        )}
+
+        {step === 4 && (
+           <div className="bg-white p-6 rounded-lg shadow-md">
+             <h2 className="text-xl font-semibold mb-6 text-gray-800 border-b border-gray-200 pb-2">4단계: 최종 확인</h2>
+             <div className="text-center py-8">
+               <p className="text-gray-600 mb-4">입력하신 내용을 확인 후 최종 생성 버튼을 눌러주세요.</p>
+             </div>
+           </div>
+        )}
+        
+        <div className="flex justify-between items-center mt-8">
+          {/* 왼쪽: 이전 버튼 */}
+          <div>
+            {step > 1 ? (
+              <Button variant="outline" onClick={handlePrevStep}>← 이전 단계</Button>
+>>>>>>> Stashed changes
             ) : (
               <Button 
                 onClick={handleSubmit}

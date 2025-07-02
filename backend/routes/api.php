@@ -12,6 +12,12 @@ use App\Http\Controllers\EvaluationController; // EvaluationController 추가
 use App\Http\Controllers\ContractController; // ContractController 추가
 use App\Http\Controllers\ScheduleController; // ScheduleController 추가
 use App\Http\Controllers\ScheduleAttachmentController; // ScheduleAttachmentController 추가
+<<<<<<< Updated upstream
+=======
+use App\Http\Controllers\AgencyController; // AgencyController 추가
+use App\Http\Controllers\CategoryController; // CategoryController 추가
+use App\Http\Controllers\AdminController; // AdminController 추가
+>>>>>>> Stashed changes
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +37,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // RFP 관련 라우트
     Route::post('/rfps', [RfpController::class, 'store']);
     Route::get('/rfps', [RfpController::class, 'index']);
+<<<<<<< Updated upstream
+=======
+
+    // RFP 임시저장 관련 라우트 (구체적인 라우트를 먼저 정의)
+    Route::post('/rfps/draft', [RfpController::class, 'saveDraft']);  // 임시저장 생성
+    Route::get('/rfps/drafts', [RfpController::class, 'getDrafts']); // 임시저장 목록
+    Route::get('/rfps/{rfp}/draft', [RfpController::class, 'getDraft']); // 임시저장 조회
+    Route::put('/rfps/{rfp}/draft', [RfpController::class, 'updateDraft']); // 임시저장 수정
+    Route::post('/rfps/{rfp}/draft/publish', [RfpController::class, 'publishDraft']); // 임시저장 발행
+
+    // 일반적인 RFP 라우트 (모델 바인딩, 마지막에 정의)
+>>>>>>> Stashed changes
     Route::get('/rfps/{rfp}', [RfpController::class, 'show']);
 
     // RFP 요소 정의 관련 라우트 (기존 index 포함, NEW: store, update, destroy)
@@ -81,5 +99,36 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'download']); // 파일 다운로드
     Route::delete('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'destroy']); // 첨부 파일 삭제
 
+<<<<<<< Updated upstream
+=======
+    // 카테고리 추천 관리 (관리자 전용)
+    Route::post('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'addRecommendation']);
+    Route::put('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'updateRecommendation']);
+    Route::delete('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'removeRecommendation']);
+    
+    // 테스트용 라우트
+    Route::post('/categories/test-recommendation', [CategoryController::class, 'testAddRecommendation']);
+
+    // 요소 추천 관리 (관리자 전용)
+    Route::post('/element-definitions/{sourceElement}/recommendations/{targetElement}', [ElementDefinitionController::class, 'addRecommendation']);
+    Route::put('/element-definitions/{sourceElement}/recommendations/{targetElement}', [ElementDefinitionController::class, 'updateRecommendation']);
+    Route::delete('/element-definitions/{sourceElement}/recommendations/{targetElement}', [ElementDefinitionController::class, 'removeRecommendation']);
+
+    // 관리자 전용 라우트 (Admin Management)
+    Route::prefix('admin')->group(function () {
+        Route::get('/agencies', [AdminController::class, 'getAgencies']); // 대행사 목록 조회
+        Route::get('/vendors', [AdminController::class, 'getVendors']); // 용역사 목록 조회
+        Route::put('/agencies/{agency}', [AdminController::class, 'updateAgency']); // 대행사 정보 수정
+        Route::put('/vendors/{vendor}', [AdminController::class, 'updateVendor']); // 용역사 정보 수정
+        Route::put('/users/{user}/status', [AdminController::class, 'updateUserStatus']); // 사용자 상태 수정
+        
+        // 🆕 동적 스펙 템플릿 관리 라우트
+        Route::get('/element-templates', [AdminController::class, 'getElementTemplates']); // 모든 요소 템플릿 목록
+        Route::get('/element-templates/{element}', [AdminController::class, 'getElementTemplate']); // 특정 요소 템플릿 상세
+        Route::put('/element-templates/{element}', [AdminController::class, 'updateElementTemplate']); // 요소 템플릿 업데이트
+        Route::post('/element-templates/{element}/reset', [AdminController::class, 'resetElementTemplate']); // 요소 템플릿 초기화
+    });
+
+>>>>>>> Stashed changes
     // 여기에 향후 다른 인증 필요한 API 라우트를 추가합니다.
 });

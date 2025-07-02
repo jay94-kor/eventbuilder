@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // 트랜잭션 사용을 위해 DB 퍼사드 추가
-use Illuminate\Support\Facades\Auth; // 현재 인증된 사용자 정보 가져오기 위해 Auth 퍼사드 추가
-use App\Models\Project; // Project 모델 사용
-use App\Models\Rfp;     // Rfp 모델 사용
-use App\Models\RfpElement; // RfpElement 모델 사용
+use Illuminate\Support\Facades\Auth;
+use App\Models\Rfp;
+use App\Services\RfpService;
+use App\Http\Requests\StoreRfpRequest;
+use App\Http\Requests\StoreDraftRfpRequest;
+use App\Http\Requests\UpdateDraftRfpRequest;
+use App\Http\Requests\PublishDraftRfpRequest;
+use App\Http\Responses\ApiResponse;
 
 class RfpController extends Controller
 {
+    protected $rfpService;
+
+    public function __construct(RfpService $rfpService)
+    {
+        $this->rfpService = $rfpService;
+    }
     /**
      * RFP 생성 (POST /api/rfps)
      *
@@ -76,11 +85,12 @@ class RfpController extends Controller
      *     )
      * )
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreRfpRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(StoreRfpRequest $request)
     {
+<<<<<<< Updated upstream
         // 1. 요청 데이터 유효성 검사
         $validatedData = $request->validate([
             // Project 기본 정보 유효성 검사
@@ -133,73 +143,31 @@ class RfpController extends Controller
         // 프로젝트, RFP, RFP 요소 생성이 모두 성공해야 하므로 트랜잭션으로 묶습니다.
         DB::beginTransaction();
 
+=======
+>>>>>>> Stashed changes
         try {
-            // 2. Project 생성
-            $project = Project::create([
-                'project_name' => $validatedData['project_name'],
-                'start_datetime' => $validatedData['start_datetime'],
-                'end_datetime' => $validatedData['end_datetime'],
-                'preparation_start_datetime' => $validatedData['preparation_start_datetime'] ?? null,
-                '철수_end_datetime' => $validatedData['철수_end_datetime'] ?? null,
-                'client_name' => $validatedData['client_name'] ?? null,
-                'client_contact_person' => $validatedData['client_contact_person'] ?? null,
-                'client_contact_number' => $validatedData['client_contact_number'] ?? null,
-                'main_agency_contact_user_id' => $user->id, // 현재 로그인한 사용자를 정 담당자로 설정
-                'sub_agency_contact_user_id' => null, // 부 담당자는 나중에 추가하거나, 요청에서 받을 수 있음
-                'is_indoor' => $validatedData['is_indoor'],
-                'location' => $validatedData['location'],
-                'budget_including_vat' => $validatedData['budget_including_vat'] ?? null,
-                'agency_id' => $user->agency_members->first()->agency_id ?? null, // 현재 사용자의 소속 대행사 ID (복수 소속 시 처리 로직 필요)
-            ]);
-
-            // 3. RFP 생성
-            $rfp = Rfp::create([
-                'project_id' => $project->id,
-                'current_status' => 'draft', // RFP 생성 시 초기 상태는 'draft' (초안)
-                'created_by_user_id' => $user->id,
-                'agency_id' => $project->agency_id,
-                'issue_type' => $validatedData['issue_type'],
-                'rfp_description' => $validatedData['rfp_description'] ?? null,
-                'closing_at' => $validatedData['closing_at'],
-                // published_at은 결재 승인 후 공고 시점에 설정
-            ]);
-
-            // 4. RFP 요소 (RfpElement) 생성
-            $elementMap = []; // parent_rfp_element_id 처리를 위한 맵
-            foreach ($validatedData['elements'] as $elementData) {
-                // 'parent_rfp_element_id'는 입력에서 직접 받지 않고, issue_type에 따라 내부 로직으로 설정합니다.
-                // 지금은 단순화를 위해 NULL로 두거나, 나중에 group_id 등을 처리할 때 활용합니다.
-                $rfpElement = RfpElement::create([
-                    'rfp_id' => $rfp->id,
-                    'element_type' => $elementData['element_type'],
-                    'details' => $elementData['details'] ?? [], // JSONB 필드
-                    'allocated_budget' => $elementData['allocated_budget'] ?? null,
-                    'prepayment_ratio' => $elementData['prepayment_ratio'] ?? null,
-                    'prepayment_due_date' => $elementData['prepayment_due_date'] ?? null,
-                    'balance_ratio' => $elementData['balance_ratio'] ?? null,
-                    'balance_due_date' => $elementData['balance_due_date'] ?? null,
-                    // 'parent_rfp_element_id'는 'separated_by_group' 발주 시에만 의미 있음.
-                    // 현재는 단순화를 위해 기본적으로 NULL로 처리.
-                ]);
-                $elementMap[$rfpElement->id] = $rfpElement; // 나중에 parent_rfp_element_id 설정 시 사용 가능
+            $user = Auth::user();
+            
+            // 권한 체크
+            if ($user->user_type !== 'agency_member' && $user->user_type !== 'admin') {
+                return ApiResponse::forbidden('RFP 생성 권한이 없습니다.');
             }
 
-            // 트랜잭션 커밋
-            DB::commit();
+            if ($user->user_type === 'agency_member') {
+                $agencyId = $user->agency_members->first()->agency_id ?? null;
+                if (!$agencyId) {
+                    return ApiResponse::forbidden('소속된 대행사 정보를 찾을 수 없습니다.');
+                }
+            }
 
-            return response()->json([
-                'message' => 'RFP가 성공적으로 생성되었습니다.',
-                'rfp' => $rfp->load('project', 'elements'), // 생성된 RFP 정보와 관련 프로젝트, 요소들을 함께 반환
-            ], 201); // 201 Created
+            $result = $this->rfpService->createRfp($request->validated());
+
+            return ApiResponse::created('RFP가 성공적으로 생성되었습니다.', [
+                'rfp' => $result['rfp'],
+            ]);
 
         } catch (\Exception $e) {
-            // 예외 발생 시 트랜잭션 롤백
-            DB::rollBack();
-            return response()->json([
-                'message' => 'RFP 생성 중 오류가 발생했습니다.',
-                'error' => $e->getMessage(),
-                'trace' => config('app.debug') ? $e->getTraceAsString() : null, // 디버그 모드에서만 스택 트레이스 표시
-            ], 500); // 500 Internal Server Error
+            return ApiResponse::serverError('RFP 생성 중 오류가 발생했습니다.', $e->getMessage());
         }
     }
 
@@ -348,4 +316,315 @@ class RfpController extends Controller
             'rfp' => $rfp,
         ], 200);
     }
+<<<<<<< Updated upstream
+=======
+
+    /**
+     * RFP 임시저장 (POST /api/rfps/draft)
+     *
+     * @OA\Post(
+     *     path="/api/rfps/draft",
+     *     tags={"RFP Management"},
+     *     summary="RFP 임시저장",
+     *     description="RFP 작성 중 임시저장합니다. 불완전한 데이터도 저장 가능합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="project_name", type="string", example="2024 신년 행사"),
+     *             @OA\Property(property="start_datetime", type="string", format="date-time", example="2024-02-01T09:00:00Z"),
+     *             @OA\Property(property="end_datetime", type="string", format="date-time", example="2024-02-01T18:00:00Z"),
+     *             @OA\Property(property="client_name", type="string", example="ABC 회사"),
+     *             @OA\Property(property="location", type="string", example="서울시 강남구 코엑스"),
+     *             @OA\Property(property="issue_type", type="string", enum={"integrated","separated_by_element","separated_by_group"}, example="integrated"),
+     *             @OA\Property(property="elements", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="임시저장 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP가 임시저장되었습니다."),
+     *             @OA\Property(property="rfp", type="object")
+     *         )
+     *     )
+     * )
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function saveDraft(StoreDraftRfpRequest $request)
+    {
+        try {
+            $user = Auth::user();
+
+            // 권한 체크
+            if ($user->user_type !== 'agency_member' && $user->user_type !== 'admin') {
+                return ApiResponse::forbidden('RFP 생성 권한이 없습니다.');
+            }
+
+            if ($user->user_type === 'agency_member') {
+                $agencyId = $user->agency_members->first()->agency_id ?? null;
+                if (!$agencyId) {
+                    return ApiResponse::forbidden('소속된 대행사 정보를 찾을 수 없습니다.');
+                }
+            }
+
+            $result = $this->rfpService->saveDraft($request->validated());
+
+            return ApiResponse::created('RFP가 임시저장되었습니다.', [
+                'rfp' => $result['rfp'],
+            ]);
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('RFP 임시저장 중 오류가 발생했습니다.', $e->getMessage());
+        }
+    }
+
+    /**
+     * RFP 임시저장 수정 (PUT /api/rfps/{rfp}/draft)
+     *
+     * @OA\Put(
+     *     path="/api/rfps/{rfp}/draft",
+     *     tags={"RFP Management"},
+     *     summary="RFP 임시저장 수정",
+     *     description="기존 임시저장된 RFP를 수정합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="rfp",
+     *         in="path",
+     *         required=true,
+     *         description="RFP ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="임시저장 수정 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP 임시저장이 수정되었습니다."),
+     *             @OA\Property(property="rfp", type="object")
+     *         )
+     *     )
+     * )
+     *
+     * @param  UpdateDraftRfpRequest  $request
+     * @param  \App\Models\Rfp  $rfp
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateDraft(UpdateDraftRfpRequest $request, Rfp $rfp)
+    {
+        try {
+            $user = Auth::user();
+
+            // 권한 체크
+            if ($rfp->created_by_user_id !== $user->id) {
+                return ApiResponse::forbidden('이 RFP를 수정할 권한이 없습니다.');
+            }
+
+            // draft 상태인지 확인
+            if ($rfp->status !== 'draft') {
+                return ApiResponse::error('임시저장 상태의 RFP만 수정할 수 있습니다.');
+            }
+
+            $result = $this->rfpService->updateDraft($rfp, $request->validated());
+
+            return ApiResponse::success('RFP 임시저장이 수정되었습니다.', [
+                'rfp' => $result['rfp'],
+            ]);
+
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('RFP 수정 중 오류가 발생했습니다.', $e->getMessage());
+        }
+    }
+
+    /**
+     * RFP 임시저장 발행 (POST /api/rfps/{rfp}/publish)
+     *
+     * @OA\Post(
+     *     path="/api/rfps/{rfp}/publish",
+     *     tags={"RFP Management"},
+     *     summary="RFP 임시저장 발행",
+     *     description="임시저장된 RFP를 검토하고 발행합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="rfp",
+     *         in="path",
+     *         required=true,
+     *         description="RFP ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="발행 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="RFP가 성공적으로 발행되었습니다."),
+     *             @OA\Property(property="rfp", type="object")
+     *         )
+     *     )
+     * )
+     *
+     * @param  PublishDraftRfpRequest  $request
+     * @param  \App\Models\Rfp  $rfp
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function publishDraft(PublishDraftRfpRequest $request, Rfp $rfp)
+    {
+        try {
+            $user = Auth::user();
+
+            // 권한 체크
+            if ($rfp->created_by_user_id !== $user->id) {
+                return ApiResponse::forbidden('이 RFP를 발행할 권한이 없습니다.');
+            }
+
+            // draft 상태인지 확인
+            if ($rfp->status !== 'draft') {
+                return ApiResponse::error('임시저장 상태의 RFP만 발행할 수 있습니다.');
+            }
+
+            $result = $this->rfpService->publishDraft($rfp, $request->validated());
+
+            return ApiResponse::success('RFP가 성공적으로 발행되었습니다.', [
+                'rfp' => $result['rfp'],
+            ]);
+
+        } catch (\InvalidArgumentException $e) {
+            return ApiResponse::validationError($e->getMessage());
+        } catch (\Exception $e) {
+            return ApiResponse::serverError('RFP 발행 중 오류가 발생했습니다.', $e->getMessage());
+        }
+    }
+
+    /**
+     * 임시저장 RFP 목록 조회 (GET /api/rfps/drafts)
+     *
+     * @OA\Get(
+     *     path="/api/rfps/drafts",
+     *     tags={"RFP Management"},
+     *     summary="임시저장 RFP 목록 조회",
+     *     description="사용자의 임시저장된 RFP 목록을 조회합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="임시저장 목록 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="임시저장 목록을 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="drafts", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDrafts(Request $request)
+    {
+        $user = Auth::user();
+
+        // 권한 체크
+        if ($user->user_type !== 'agency_member' && $user->user_type !== 'admin') {
+            return response()->json(['message' => 'RFP 조회 권한이 없습니다.'], 403);
+        }
+
+        $drafts = Rfp::where('created_by_user_id', $user->id)
+                     ->where('current_status', 'draft')
+                     ->with('project', 'elements')
+                     ->orderBy('updated_at', 'desc')
+                     ->get();
+
+        return response()->json([
+            'message' => '임시저장 목록을 성공적으로 불러왔습니다.',
+            'drafts' => $drafts,
+        ], 200);
+    }
+
+    /**
+     * 특정 임시저장 RFP 조회 (GET /api/rfps/{rfp}/draft)
+     *
+     * @OA\Get(
+     *     path="/api/rfps/{rfp}/draft",
+     *     tags={"RFP Management"},
+     *     summary="특정 임시저장 RFP 조회",
+     *     description="특정 임시저장된 RFP의 상세 정보를 조회합니다.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="rfp",
+     *         in="path",
+     *         required=true,
+     *         description="RFP ID",
+     *         @OA\Schema(type="string", format="uuid")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="임시저장 조회 성공",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="임시저장을 성공적으로 불러왔습니다."),
+     *             @OA\Property(property="draft", type="object")
+     *         )
+     *     )
+     * )
+     *
+     * @param  \App\Models\Rfp  $rfp
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDraft(Rfp $rfp)
+    {
+        $user = Auth::user();
+
+        // 권한 체크
+        if ($rfp->created_by_user_id !== $user->id) {
+            return response()->json(['message' => '이 임시저장에 접근할 권한이 없습니다.'], 403);
+        }
+
+        // draft 상태인지 확인
+        if ($rfp->current_status !== 'draft') {
+            return response()->json(['message' => '임시저장 상태가 아닙니다.'], 400);
+        }
+
+        $rfp->load(['project.mainAgencyContactUser', 'project.subAgencyContactUser', 'elements.elementDefinition']);
+
+        // RfpElement 데이터를 프론트엔드가 기대하는 rfp_elements 형식으로 변환
+        $rfpElements = $rfp->elements->map(function ($element, $index) {
+            // 같은 ElementDefinition의 여러 인스턴스를 구분하기 위해 인덱스 기반 ID 생성
+            $instanceId = $element->element_definition_id . '-' . ($index + 1);
+            
+            return [
+                'element_definition_id' => $element->element_definition_id,
+                'element_id' => $instanceId, // 프론트엔드에서 사용하는 인스턴스 ID
+                'element_type' => $element->element_type ?? 'unknown',
+                'specifications' => $element->details ?? [],
+                'special_requirements' => $element->special_requirements,
+                'allocated_budget' => $element->allocated_budget,
+                'down_payment_ratio' => $element->prepayment_ratio ? ($element->prepayment_ratio * 100) : null, // 비율을 퍼센트로 변환
+                'down_payment_date' => $element->prepayment_due_date,
+                'final_payment_date' => $element->balance_due_date,
+            ];
+        });
+
+        // draft 응답에 변환된 rfp_elements 포함
+        $draftData = $rfp->toArray();
+        $draftData['rfp_elements'] = $rfpElements;
+
+        return response()->json([
+            'message' => '임시저장을 성공적으로 불러왔습니다.',
+            'draft' => $draftData,
+        ], 200);
+    }
+
+    /**
+     * venue_type을 is_indoor boolean으로 변환하는 헬퍼 메서드
+     */
+    private function venueTypeToIsIndoor($venueType)
+    {
+        switch ($venueType) {
+            case 'indoor':
+                return true;
+            case 'outdoor':
+                return false;
+            case 'both':
+            default:
+                return true; // 기본값은 실내
+        }
+    }
+>>>>>>> Stashed changes
 }

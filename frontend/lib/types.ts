@@ -38,6 +38,66 @@ export interface Vendor {
   masterUser?: User;
 }
 
+<<<<<<< Updated upstream
+=======
+export interface Category {
+  id: string;
+  name: string;
+  display_name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  sort_order: number;
+  complexity_level?: 'basic' | 'intermediate' | 'advanced';
+  group?: 'hardware_equipment' | 'content_direction' | 'personnel_operation' | 'planning_support_services' | 'miscellaneous';
+  element_definitions?: ElementDefinition[];
+  created_at?: string;
+  updated_at?: string;
+}
+
+// =================================
+//  🆕 Dynamic Spec System Types
+// =================================
+
+export interface SpecFieldTemplate {
+  name: string;                         // 스펙명 (예: "가로", "화질", "개수")
+  unit?: string;                        // 스펙 단위 (예: "m", "대", "W", null)
+  type: 'number' | 'text' | 'select' | 'boolean';
+  default_value?: string | number | boolean; // 기본값
+  options?: string[];                   // select 타입일 때 선택 옵션들
+  required?: boolean;                   // 필수 입력 여부
+  validation?: {                        // 검증 규칙
+    min?: number;
+    max?: number;
+    pattern?: string;
+  };
+}
+
+export interface SpecField {
+  id: string;                           // 필드 고유 ID
+  name: string;                         // 스펙명 (예: "가로", "화질", "개수")
+  unit?: string;                        // 스펙 단위 (예: "m", "대", "W", null)
+  value: string | number | boolean;     // 스펙 입력값
+  type: 'number' | 'text' | 'select' | 'boolean';
+  options?: string[];                   // select 타입일 때 선택 옵션들
+  required?: boolean;                   // 필수 입력 여부
+  validation?: {                        // 검증 규칙
+    min?: number;
+    max?: number;
+    pattern?: string;
+  };
+}
+
+export interface SpecVariant {
+  id: string;                           // UUID
+  name: string;                         // "소형 버전", "고출력 버전" 등
+  quantity: number;                     // 이 변형의 수량
+  modified_fields: string[];            // 변경된 스펙 필드 ID들
+  spec_values: Record<string, any>;     // 변경된 스펙 값들
+  notes?: string;                       // 변형별 특별 요구사항
+}
+
+>>>>>>> Stashed changes
 export interface ElementDefinition {
   id: string;
   element_type: string;
@@ -50,6 +110,21 @@ export interface ElementDefinition {
   recommended_elements?: string[];
   created_at?: string;
   updated_at?: string;
+  
+  // 🆕 동적 스펙 템플릿 정의
+  default_spec_template?: SpecFieldTemplate[];
+  quantity_config?: {
+    unit: string;                        // "대", "개", "세트", "명" 등
+    min: number;
+    max: number;
+    typical: number;
+    allow_variants: boolean;             // 변형 허용 여부
+  };
+  variant_rules?: {
+    allowed_fields: string[];            // 변형 가능한 필드 ID들
+    max_variants: number;                // 최대 변형 개수
+    require_name: boolean;               // 변형명 필수 여부
+  };
 }
 
 // =================================
@@ -252,10 +327,23 @@ export interface AnnouncementEvaluator {
 //  Form Related
 // =================================
 
+// 🔄 기존 RfpElementFormData 완전 재설계
 export interface RfpElementFormData {
   element_id: string;
   element_type: string;
-  details: Record<string, unknown>;
+  
+  // 🆕 수량 관리
+  total_quantity: number;               // 총 수량
+  base_quantity: number;                // 기본 스펙 적용 수량
+  use_variants: boolean;                // 스펙 변형 사용 여부
+  
+  // 🆕 동적 스펙 시스템
+  spec_fields: SpecField[];             // 기본 스펙 필드들
+  spec_variants: SpecVariant[];         // 스펙 변형들
+  
+  // 기존 필드들 (하위 호환성)
+  details: Record<string, unknown>;     // 기존 details → spec_fields로 변환
+  special_requirements: string;
   allocated_budget: number | null;
   prepayment_ratio: number | null;
   prepayment_due_date: Date | null;
