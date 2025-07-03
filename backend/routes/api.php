@@ -28,6 +28,11 @@ use App\Http\Controllers\AdminController;
 // 인증 관련 공개 라우트
 Route::post('/login', [AuthController::class, 'login']);
 
+// 공개 API (인증 불필요)
+Route::get('/element-definitions', [ElementDefinitionController::class, 'index']);
+Route::get('/element-definitions/grouped', [ElementDefinitionController::class, 'getGroupedByCategory']);
+Route::get('/element-definitions/{id}/with-spec-template', [ElementDefinitionController::class, 'getWithSpecTemplate']);
+
 // 인증이 필요한 라우트 (Sanctum 미들웨어를 통해 토큰 검증)
 Route::middleware('auth:sanctum')->group(function () {
     // 사용자 인증 관련 라우트
