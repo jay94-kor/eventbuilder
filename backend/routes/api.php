@@ -12,12 +12,10 @@ use App\Http\Controllers\EvaluationController; // EvaluationController 추가
 use App\Http\Controllers\ContractController; // ContractController 추가
 use App\Http\Controllers\ScheduleController; // ScheduleController 추가
 use App\Http\Controllers\ScheduleAttachmentController; // ScheduleAttachmentController 추가
-<<<<<<< Updated upstream
-=======
 use App\Http\Controllers\AgencyController; // AgencyController 추가
-use App\Http\Controllers\CategoryController; // CategoryController 추가
-use App\Http\Controllers\AdminController; // AdminController 추가
->>>>>>> Stashed changes
+use App\Http\Controllers\Admin\UserManagementController; // 사용자 관리
+use App\Http\Controllers\Admin\AgencyManagementController; // 대행사/용역사 관리
+use App\Http\Controllers\Admin\ElementTemplateController; // 요소 템플릿 관리
 
 /*
 |--------------------------------------------------------------------------
@@ -37,8 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // RFP 관련 라우트
     Route::post('/rfps', [RfpController::class, 'store']);
     Route::get('/rfps', [RfpController::class, 'index']);
-<<<<<<< Updated upstream
-=======
 
     // RFP 임시저장 관련 라우트 (구체적인 라우트를 먼저 정의)
     Route::post('/rfps/draft', [RfpController::class, 'saveDraft']);  // 임시저장 생성
@@ -48,7 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/rfps/{rfp}/draft/publish', [RfpController::class, 'publishDraft']); // 임시저장 발행
 
     // 일반적인 RFP 라우트 (모델 바인딩, 마지막에 정의)
->>>>>>> Stashed changes
     Route::get('/rfps/{rfp}', [RfpController::class, 'show']);
 
     // RFP 요소 정의 관련 라우트 (기존 index 포함, NEW: store, update, destroy)
@@ -99,15 +94,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'download']); // 파일 다운로드
     Route::delete('/schedule-attachments/{attachment}', [ScheduleAttachmentController::class, 'destroy']); // 첨부 파일 삭제
 
-<<<<<<< Updated upstream
-=======
-    // 카테고리 추천 관리 (관리자 전용)
-    Route::post('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'addRecommendation']);
-    Route::put('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'updateRecommendation']);
-    Route::delete('/categories/{sourceCategory}/recommendations/{targetCategory}', [CategoryController::class, 'removeRecommendation']);
-    
-    // 테스트용 라우트
-    Route::post('/categories/test-recommendation', [CategoryController::class, 'testAddRecommendation']);
 
     // 요소 추천 관리 (관리자 전용)
     Route::post('/element-definitions/{sourceElement}/recommendations/{targetElement}', [ElementDefinitionController::class, 'addRecommendation']);
@@ -116,19 +102,26 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 관리자 전용 라우트 (Admin Management)
     Route::prefix('admin')->group(function () {
-        Route::get('/agencies', [AdminController::class, 'getAgencies']); // 대행사 목록 조회
-        Route::get('/vendors', [AdminController::class, 'getVendors']); // 용역사 목록 조회
-        Route::put('/agencies/{agency}', [AdminController::class, 'updateAgency']); // 대행사 정보 수정
-        Route::put('/vendors/{vendor}', [AdminController::class, 'updateVendor']); // 용역사 정보 수정
-        Route::put('/users/{user}/status', [AdminController::class, 'updateUserStatus']); // 사용자 상태 수정
+        // 사용자 관리
+        Route::get('/users', [UserManagementController::class, 'index']); // 사용자 목록 조회
+        Route::get('/users/{user}', [UserManagementController::class, 'show']); // 사용자 상세 조회
+        Route::put('/users/{user}/status', [UserManagementController::class, 'updateStatus']); // 사용자 상태 수정
+        Route::get('/users/stats/pending', [UserManagementController::class, 'getPendingStats']); // 승인 대기 통계
         
-        // 🆕 동적 스펙 템플릿 관리 라우트
-        Route::get('/element-templates', [AdminController::class, 'getElementTemplates']); // 모든 요소 템플릿 목록
-        Route::get('/element-templates/{element}', [AdminController::class, 'getElementTemplate']); // 특정 요소 템플릿 상세
-        Route::put('/element-templates/{element}', [AdminController::class, 'updateElementTemplate']); // 요소 템플릿 업데이트
-        Route::post('/element-templates/{element}/reset', [AdminController::class, 'resetElementTemplate']); // 요소 템플릿 초기화
+        // 대행사/용역사 관리
+        Route::get('/agencies', [AgencyManagementController::class, 'getAgencies']); // 대행사 목록 조회
+        Route::get('/vendors', [AgencyManagementController::class, 'getVendors']); // 용역사 목록 조회
+        Route::put('/agencies/{agency}', [AgencyManagementController::class, 'updateAgency']); // 대행사 정보 수정
+        Route::put('/vendors/{vendor}', [AgencyManagementController::class, 'updateVendor']); // 용역사 정보 수정
+        Route::get('/agencies/stats', [AgencyManagementController::class, 'getAgencyStats']); // 대행사 통계
+        Route::get('/vendors/stats', [AgencyManagementController::class, 'getVendorStats']); // 용역사 통계
+        
+        // 요소 템플릿 관리
+        Route::get('/element-templates', [ElementTemplateController::class, 'index']); // 모든 요소 템플릿 목록
+        Route::get('/element-templates/{element}', [ElementTemplateController::class, 'show']); // 특정 요소 템플릿 상세
+        Route::put('/element-templates/{element}', [ElementTemplateController::class, 'update']); // 요소 템플릿 업데이트
+        Route::post('/element-templates/{element}/reset', [ElementTemplateController::class, 'reset']); // 요소 템플릿 초기화
+        Route::get('/element-templates/stats', [ElementTemplateController::class, 'getStats']); // 템플릿 통계
     });
-
->>>>>>> Stashed changes
     // 여기에 향후 다른 인증 필요한 API 라우트를 추가합니다.
 });

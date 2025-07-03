@@ -90,61 +90,6 @@ class RfpController extends Controller
      */
     public function store(StoreRfpRequest $request)
     {
-<<<<<<< Updated upstream
-        // 1. 요청 데이터 유효성 검사
-        $validatedData = $request->validate([
-            // Project 기본 정보 유효성 검사
-            'project_name' => 'required|string|max:255',
-            'start_datetime' => 'required|date',
-            'end_datetime' => 'required|date|after_or_equal:start_datetime',
-            'preparation_start_datetime' => 'nullable|date',
-            '철수_end_datetime' => 'nullable|date|after_or_equal:preparation_start_datetime',
-            'client_name' => 'nullable|string|max:255',
-            'client_contact_person' => 'nullable|string|max:255',
-            'client_contact_number' => 'nullable|string|max:20',
-            'is_indoor' => 'required|boolean',
-            'location' => 'required|string|max:255',
-            'budget_including_vat' => 'nullable|numeric|min:0',
-
-            // RFP 관련 정보 유효성 검사
-            'issue_type' => 'required|in:integrated,separated_by_element,separated_by_group',
-            'rfp_description' => 'nullable|string',
-            'closing_at' => 'required|date|after:now',
-
-            // RFP 요소 (rfp_elements) 유효성 검사
-            'elements' => 'required|array|min:1', // 최소 하나의 요소는 있어야 함
-            'elements.*.element_type' => 'required|string|max:100', // element_type은 VARCHAR(100)로 자유롭게 입력 가능
-            'elements.*.details' => 'nullable|array', // JSONB 데이터는 배열 형태로 받음
-            'elements.*.allocated_budget' => 'nullable|numeric|min:0',
-            'elements.*.prepayment_ratio' => 'nullable|numeric|min:0|max:1',
-            'elements.*.prepayment_due_date' => 'nullable|date|after_or_equal:today',
-            'elements.*.balance_ratio' => 'nullable|numeric|min:0|max:1',
-            'elements.*.balance_due_date' => 'nullable|date|after_or_equal:today',
-            // 'elements.*.parent_rfp_element_id'는 내부 로직으로 처리하므로 유효성 검사에서 제외
-        ]);
-
-        // 현재 인증된 사용자 정보 (사내 행사 담당자)
-        $user = Auth::user();
-
-        // 권한 체크: agency_member만 RFP를 생성할 수 있음
-        if ($user->user_type !== 'agency_member' && $user->user_type !== 'admin') {
-            return response()->json(['message' => 'RFP 생성 권한이 없습니다.'], 403);
-        }
-
-        // 대행사 멤버인 경우 소속 대행사가 있는지 확인
-        if ($user->user_type === 'agency_member') {
-            $agencyId = $user->agency_members->first()->agency_id ?? null;
-            if (!$agencyId) {
-                return response()->json(['message' => '소속된 대행사 정보를 찾을 수 없습니다.'], 403);
-            }
-        }
-
-        // 데이터베이스 트랜잭션 시작
-        // 프로젝트, RFP, RFP 요소 생성이 모두 성공해야 하므로 트랜잭션으로 묶습니다.
-        DB::beginTransaction();
-
-=======
->>>>>>> Stashed changes
         try {
             $user = Auth::user();
             
@@ -316,8 +261,6 @@ class RfpController extends Controller
             'rfp' => $rfp,
         ], 200);
     }
-<<<<<<< Updated upstream
-=======
 
     /**
      * RFP 임시저장 (POST /api/rfps/draft)
@@ -626,5 +569,4 @@ class RfpController extends Controller
                 return true; // 기본값은 실내
         }
     }
->>>>>>> Stashed changes
 }
