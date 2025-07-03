@@ -53,10 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // 일반적인 RFP 라우트 (모델 바인딩, 마지막에 정의)
     Route::get('/rfps/{rfp}', [RfpController::class, 'show']);
 
-    // RFP 요소 정의 관련 라우트
-    Route::get('/element-definitions', [ElementDefinitionController::class, 'index']);
-    Route::get('/element-definitions/grouped', [ElementDefinitionController::class, 'getGroupedByCategory']); // NEW: 카테고리별 그룹화
-    Route::get('/element-definitions/{id}/with-spec-template', [ElementDefinitionController::class, 'getWithSpecTemplate']); // NEW: 스펙 템플릿 포함
+    // RFP 요소 정의 관련 라우트 (관리자 전용)
     Route::post('/element-definitions', [ElementDefinitionController::class, 'store']); // NEW: 생성
     Route::put('/element-definitions/{elementDefinition}', [ElementDefinitionController::class, 'update']); // NEW: 수정
     Route::delete('/element-definitions/{elementDefinition}', [ElementDefinitionController::class, 'destroy']); // NEW: 삭제
