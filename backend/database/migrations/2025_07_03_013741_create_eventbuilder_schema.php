@@ -12,7 +12,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // ========== 1. ENUM 타입 생성 ==========
+        // ========== 1. ENUM 타입 생성 (IF NOT EXISTS 사용) ==========
+        DB::statement("DROP TYPE IF EXISTS user_type_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS account_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS subscription_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS vendor_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS rfp_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS approval_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS issue_type_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS announcement_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS proposal_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS contract_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS payment_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS schedule_type_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS schedule_status_enum CASCADE");
+        DB::statement("DROP TYPE IF EXISTS notification_type_enum CASCADE");
+        
         DB::statement("CREATE TYPE user_type_enum AS ENUM ('agency_member', 'vendor_member', 'admin')");
         DB::statement("CREATE TYPE account_status_enum AS ENUM ('pending', 'approved', 'rejected', 'suspended')");
         DB::statement("CREATE TYPE subscription_status_enum AS ENUM ('active', 'inactive', 'suspended')");
@@ -51,7 +66,6 @@ return new class extends Migration
             $table->index(['account_status']);
             $table->index(['email_verified_at']);
             $table->index(['approved_at']);
-            $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
         });
 
         // 대행사 테이블
@@ -222,7 +236,9 @@ return new class extends Migration
             $table->index(['is_active', 'priority']);
         });
 
-        // ========== 4. 프로젝트 및 RFP 관련 ==========
+        // ========== 4. 프로젝트 및 RFP 관련 (스탭별 재배치) ==========
+        
+        // ========== Step 1: 프로젝트 및 RFP 생성 ==========
         
         // 프로젝트 테이블
         Schema::create('projects', function (Blueprint $table) {
@@ -275,6 +291,8 @@ return new class extends Migration
             $table->index(['agency_id', 'status']);
         });
 
+        // ========== Step 3: RFP 요소 정의 ==========
+        
         // RFP 요소 테이블
         Schema::create('rfp_elements', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -301,12 +319,13 @@ return new class extends Migration
 
             $table->foreign('rfp_id')->references('id')->on('rfps')->onDelete('cascade');
             $table->foreign('element_definition_id')->references('id')->on('element_definitions')->onDelete('set null');
-            $table->foreign('parent_rfp_element_id')->references('id')->on('rfp_elements')->onDelete('cascade');
             $table->index(['rfp_id']);
             $table->index(['element_type']);
             $table->index(['rfp_id', 'element_type']);
         });
 
+        // ========== Step 4: RFP 승인 및 공고 관련 ==========
+        
         // RFP 승인 테이블
         Schema::create('rfp_approvals', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -325,8 +344,6 @@ return new class extends Migration
             $table->index(['status']);
         });
 
-        // ========== 5. 공고 및 제안서 관련 ==========
-        
         // 공고 테이블
         Schema::create('announcements', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -344,6 +361,22 @@ return new class extends Migration
             $table->index(['closing_at']);
         });
 
+        // 공고 평가자 테이블
+        Schema::create('announcement_evaluators', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->uuid('announcement_id');
+            $table->uuid('user_id');
+            $table->string('role')->default('evaluator');
+            $table->timestamp('assigned_at');
+            $table->timestamps();
+
+            $table->foreign('announcement_id')->references('id')->on('announcements')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->unique(['announcement_id', 'user_id']);
+        });
+
+        // ========== Step 이후: 제안서, 평가, 계약 및 스케줄 관련 ==========
+        
         // 제안서 테이블
         Schema::create('proposals', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -383,22 +416,6 @@ return new class extends Migration
             $table->unique(['proposal_id', 'evaluator_user_id']);
         });
 
-        // 공고 평가자 테이블
-        Schema::create('announcement_evaluators', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('announcement_id');
-            $table->uuid('user_id');
-            $table->string('role')->default('evaluator');
-            $table->timestamp('assigned_at');
-            $table->timestamps();
-
-            $table->foreign('announcement_id')->references('id')->on('announcements')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->unique(['announcement_id', 'user_id']);
-        });
-
-        // ========== 6. 계약 및 스케줄 관련 ==========
-        
         // 계약 테이블
         Schema::create('contracts', function (Blueprint $table) {
             $table->uuid('id')->primary();
@@ -564,6 +581,15 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
+
+        // ========== 9. 외래키 제약조건 추가 (self-referencing) ==========
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
+        });
+
+        Schema::table('rfp_elements', function (Blueprint $table) {
+            $table->foreign('parent_rfp_element_id')->references('id')->on('rfp_elements')->onDelete('cascade');
+        });
     }
 
     /**
@@ -571,6 +597,15 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // 외래키 제약조건 먼저 삭제
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['approved_by']);
+        });
+
+        Schema::table('rfp_elements', function (Blueprint $table) {
+            $table->dropForeign(['parent_rfp_element_id']);
+        });
+
         // 외래키 제약조건 순서를 고려하여 역순으로 삭제
         Schema::dropIfExists('personal_access_tokens');
         Schema::dropIfExists('failed_jobs');

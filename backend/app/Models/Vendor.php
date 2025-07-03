@@ -18,13 +18,10 @@ class Vendor extends Model
         'specialties',
         'master_user_id',
         'status',
-        'ban_reason',
-        'banned_at',
     ];
 
     protected $casts = [
         'specialties' => 'array', // JSONB 필드는 'array' 또는 'asArray'로 캐스팅
-        'banned_at' => 'datetime',
     ];
 
     /**

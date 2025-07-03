@@ -13,7 +13,8 @@ class RfpElement extends Model
     protected $fillable = [
         'rfp_id',
         'element_type',
-        'details',
+        'specifications',
+        'special_requirements',
         'allocated_budget',
         'prepayment_ratio',
         'prepayment_due_date',
@@ -29,8 +30,7 @@ class RfpElement extends Model
     ];
 
     protected $casts = [
-        'details' => 'array', // JSONB 필드를 배열로 자동 캐스팅
-        'details' => 'array', // JSONB 필드를 배열로 자동 캐스팅 (하위 호환성)
+        'specifications' => 'array', // JSONB 필드를 배열로 자동 캐스팅
         'prepayment_due_date' => 'datetime',
         'balance_due_date' => 'datetime',
         
@@ -53,6 +53,12 @@ class RfpElement extends Model
     // 🆕 스펙 값 접근자
     public function getSpecValue(string $fieldName): mixed
     {
+        // 새로운 specifications 필드에서 찾기
+        if (!empty($this->specifications[$fieldName])) {
+            return $this->specifications[$fieldName];
+        }
+        
+        // spec_fields에서 찾기 (하위 호환성)
         $field = collect($this->spec_fields)->firstWhere('name', $fieldName);
         return $field['value'] ?? null;
     }
