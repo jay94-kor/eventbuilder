@@ -795,6 +795,9 @@ export default function AdminDashboard() {
     }
   };
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -1186,6 +1189,303 @@ export default function AdminDashboard() {
       {/* 🆕 Dynamic Template Edit Modal */}
       <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+<<<<<<< Updated upstream
+=======
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              {currentTemplate?.display_name} - 동적 스펙 템플릿 편집
+            </DialogTitle>
+            <DialogDescription>
+              {currentTemplate?.element_type} 요소의 스펙 필드와 수량 설정을 관리합니다.
+            </DialogDescription>
+          </DialogHeader>
+
+          {currentTemplate && (
+            <div className="space-y-6">
+              {/* 수량 설정 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">수량 설정</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label>단위</Label>
+                      <Input
+                        value={templateFormData.quantity_config.unit}
+                        onChange={(e) => setTemplateFormData(prev => ({
+                          ...prev,
+                          quantity_config: { ...prev.quantity_config, unit: e.target.value }
+                        }))}
+                        placeholder="대, 개, 세트..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>최소</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={templateFormData.quantity_config.min}
+                        onChange={(e) => setTemplateFormData(prev => ({
+                          ...prev,
+                          quantity_config: { ...prev.quantity_config, min: parseInt(e.target.value) || 1 }
+                        }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>최대</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={templateFormData.quantity_config.max}
+                        onChange={(e) => setTemplateFormData(prev => ({
+                          ...prev,
+                          quantity_config: { ...prev.quantity_config, max: parseInt(e.target.value) || 10 }
+                        }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>권장</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={templateFormData.quantity_config.typical}
+                        onChange={(e) => setTemplateFormData(prev => ({
+                          ...prev,
+                          quantity_config: { ...prev.quantity_config, typical: parseInt(e.target.value) || 1 }
+                        }))}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={templateFormData.quantity_config.allow_variants}
+                      onCheckedChange={(checked) => setTemplateFormData(prev => ({
+                        ...prev,
+                        quantity_config: { ...prev.quantity_config, allow_variants: !!checked }
+                      }))}
+                    />
+                    <Label className="text-sm">스펙 변형 허용</Label>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 스펙 필드 관리 */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">스펙 필드</CardTitle>
+                    <Button size="sm" onClick={addSpecField}>
+                      <Plus className="w-4 h-4 mr-1" />
+                      필드 추가
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {templateFormData.default_spec_template.length > 0 ? (
+                    <div className="space-y-4">
+                      {templateFormData.default_spec_template.map((field, index) => (
+                        <Card key={index} className="p-4">
+                          <div className="grid grid-cols-12 gap-3 items-start">
+                            {/* 필드명 */}
+                            <div className="col-span-3">
+                              <Label className="text-xs">필드명</Label>
+                              <Input
+                                value={field.name}
+                                onChange={(e) => updateSpecField(index, { name: e.target.value })}
+                                placeholder="가로, 세로, 해상도..."
+                                className="text-sm"
+                              />
+                            </div>
+
+                            {/* 타입 */}
+                            <div className="col-span-2">
+                              <Label className="text-xs">타입</Label>
+                              <Select
+                                value={field.type}
+                                onValueChange={(value: 'number' | 'text' | 'select' | 'boolean') => 
+                                  updateSpecField(index, { type: value })
+                                }
+                              >
+                                <SelectTrigger className="text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="number">숫자</SelectItem>
+                                  <SelectItem value="text">텍스트</SelectItem>
+                                  <SelectItem value="select">선택</SelectItem>
+                                  <SelectItem value="boolean">체크박스</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {/* 단위 */}
+                            <div className="col-span-2">
+                              <Label className="text-xs">단위</Label>
+                              <Input
+                                value={field.unit || ''}
+                                onChange={(e) => updateSpecField(index, { unit: e.target.value })}
+                                placeholder="m, W, 대..."
+                                className="text-sm"
+                              />
+                            </div>
+
+                            {/* 기본값 */}
+                            <div className="col-span-2">
+                              <Label className="text-xs">기본값</Label>
+                              {field.type === 'boolean' ? (
+                                <div className="flex items-center mt-1">
+                                  <Checkbox
+                                    checked={!!field.default_value}
+                                    onCheckedChange={(checked) => updateSpecField(index, { default_value: checked })}
+                                  />
+                                </div>
+                              ) : field.type === 'select' ? (
+                                <Select
+                                  value={field.default_value || ''}
+                                  onValueChange={(value) => updateSpecField(index, { default_value: value })}
+                                >
+                                  <SelectTrigger className="text-sm">
+                                    <SelectValue placeholder="선택..." />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {field.options?.map((option) => (
+                                      <SelectItem key={option} value={option}>
+                                        {option}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <Input
+                                  value={field.default_value || ''}
+                                  onChange={(e) => updateSpecField(index, { 
+                                    default_value: field.type === 'number' ? 
+                                      (parseFloat(e.target.value) || 0) : 
+                                      e.target.value 
+                                  })}
+                                  type={field.type === 'number' ? 'number' : 'text'}
+                                  className="text-sm"
+                                />
+                              )}
+                            </div>
+
+                            {/* 필수/삭제 */}
+                            <div className="col-span-2">
+                              <Label className="text-xs">옵션</Label>
+                              <div className="flex items-center gap-2 mt-1">
+                                <div className="flex items-center space-x-1">
+                                  <Checkbox
+                                    checked={!!field.required}
+                                    onCheckedChange={(checked) => updateSpecField(index, { required: !!checked })}
+                                  />
+                                  <span className="text-xs">필수</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => removeSpecField(index)}
+                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-800"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* select 타입일 때 옵션 관리 */}
+                            {field.type === 'select' && (
+                              <div className="col-span-12 mt-2">
+                                <Label className="text-xs">선택 옵션 (쉼표로 구분)</Label>
+                                <Input
+                                  value={field.options?.join(', ') || ''}
+                                  onChange={(e) => updateSpecField(index, { 
+                                    options: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                                  })}
+                                  placeholder="옵션1, 옵션2, 옵션3..."
+                                  className="text-sm"
+                                />
+                              </div>
+                            )}
+
+                            {/* number 타입일 때 검증 규칙 */}
+                            {field.type === 'number' && (
+                              <div className="col-span-12 mt-2">
+                                <Label className="text-xs">검증 규칙</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <Input
+                                    type="number"
+                                    value={field.validation?.min || ''}
+                                    onChange={(e) => updateSpecField(index, { 
+                                      validation: { 
+                                        ...field.validation, 
+                                        min: parseFloat(e.target.value) || undefined 
+                                      } 
+                                    })}
+                                    placeholder="최소값"
+                                    className="text-sm"
+                                  />
+                                  <Input
+                                    type="number"
+                                    value={field.validation?.max || ''}
+                                    onChange={(e) => updateSpecField(index, { 
+                                      validation: { 
+                                        ...field.validation, 
+                                        max: parseFloat(e.target.value) || undefined 
+                                      } 
+                                    })}
+                                    placeholder="최대값"
+                                    className="text-sm"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Package className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-gray-500 text-sm">스펙 필드를 추가해주세요.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
+                  취소
+                </Button>
+                <Button onClick={handleTemplateSubmit} disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      저장 중...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      저장
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for Category/Element CRUD */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+>>>>>>> Stashed changes
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />

@@ -535,7 +535,11 @@ class RfpController extends Controller
                 'element_definition_id' => $element->element_definition_id,
                 'element_id' => $instanceId, // 프론트엔드에서 사용하는 인스턴스 ID
                 'element_type' => $element->element_type ?? 'unknown',
+<<<<<<< Updated upstream
                 'specifications' => $element->specifications ?? [],
+=======
+                'specifications' => $element->details ?? [],
+>>>>>>> Stashed changes
                 'special_requirements' => $element->special_requirements,
                 'allocated_budget' => $element->allocated_budget,
                 'down_payment_ratio' => $element->prepayment_ratio ? ($element->prepayment_ratio * 100) : null, // 비율을 퍼센트로 변환

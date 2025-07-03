@@ -97,6 +97,9 @@ export interface SpecVariant {
   notes?: string;                       // 변형별 특별 요구사항
 }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 export interface ElementDefinition {
   id: string;

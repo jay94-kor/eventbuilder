@@ -30,7 +30,11 @@ class RfpElement extends Model
     ];
 
     protected $casts = [
+<<<<<<< Updated upstream
         'specifications' => 'array', // JSONB 필드를 배열로 자동 캐스팅
+=======
+        'details' => 'array', // JSONB 필드를 배열로 자동 캐스팅 (하위 호환성)
+>>>>>>> Stashed changes
         'prepayment_due_date' => 'datetime',
         'balance_due_date' => 'datetime',
         
@@ -53,12 +57,15 @@ class RfpElement extends Model
     // 🆕 스펙 값 접근자
     public function getSpecValue(string $fieldName): mixed
     {
+<<<<<<< Updated upstream
         // 새로운 specifications 필드에서 찾기
         if (!empty($this->specifications[$fieldName])) {
             return $this->specifications[$fieldName];
         }
         
         // spec_fields에서 찾기 (하위 호환성)
+=======
+>>>>>>> Stashed changes
         $field = collect($this->spec_fields)->firstWhere('name', $fieldName);
         return $field['value'] ?? null;
     }

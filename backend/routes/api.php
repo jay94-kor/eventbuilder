@@ -13,9 +13,14 @@ use App\Http\Controllers\ContractController; // ContractController 추가
 use App\Http\Controllers\ScheduleController; // ScheduleController 추가
 use App\Http\Controllers\ScheduleAttachmentController; // ScheduleAttachmentController 추가
 use App\Http\Controllers\AgencyController; // AgencyController 추가
+<<<<<<< Updated upstream
 use App\Http\Controllers\Admin\UserManagementController; // 사용자 관리
 use App\Http\Controllers\Admin\AgencyManagementController; // 대행사/용역사 관리
 use App\Http\Controllers\Admin\ElementTemplateController; // 요소 템플릿 관리
+=======
+use App\Http\Controllers\CategoryController; // CategoryController 추가
+use App\Http\Controllers\AdminController; // AdminController 추가
+>>>>>>> Stashed changes
 
 /*
 |--------------------------------------------------------------------------
@@ -102,6 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 관리자 전용 라우트 (Admin Management)
     Route::prefix('admin')->group(function () {
+<<<<<<< Updated upstream
         // 사용자 관리
         Route::get('/users', [UserManagementController::class, 'index']); // 사용자 목록 조회
         Route::get('/users/{user}', [UserManagementController::class, 'show']); // 사용자 상세 조회
@@ -123,5 +129,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/element-templates/{element}/reset', [ElementTemplateController::class, 'reset']); // 요소 템플릿 초기화
         Route::get('/element-templates/stats', [ElementTemplateController::class, 'getStats']); // 템플릿 통계
     });
+=======
+        Route::get('/agencies', [AdminController::class, 'getAgencies']); // 대행사 목록 조회
+        Route::get('/vendors', [AdminController::class, 'getVendors']); // 용역사 목록 조회
+        Route::put('/agencies/{agency}', [AdminController::class, 'updateAgency']); // 대행사 정보 수정
+        Route::put('/vendors/{vendor}', [AdminController::class, 'updateVendor']); // 용역사 정보 수정
+        Route::put('/users/{user}/status', [AdminController::class, 'updateUserStatus']); // 사용자 상태 수정
+        
+        // 🆕 동적 스펙 템플릿 관리 라우트
+        Route::get('/element-templates', [AdminController::class, 'getElementTemplates']); // 모든 요소 템플릿 목록
+        Route::get('/element-templates/{element}', [AdminController::class, 'getElementTemplate']); // 특정 요소 템플릿 상세
+        Route::put('/element-templates/{element}', [AdminController::class, 'updateElementTemplate']); // 요소 템플릿 업데이트
+        Route::post('/element-templates/{element}/reset', [AdminController::class, 'resetElementTemplate']); // 요소 템플릿 초기화
+    });
+
+>>>>>>> Stashed changes
     // 여기에 향후 다른 인증 필요한 API 라우트를 추가합니다.
 });
