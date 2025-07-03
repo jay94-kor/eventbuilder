@@ -29,9 +29,7 @@ class RfpElement extends Model
     ];
 
     protected $casts = [
-<<<<<<< Updated upstream
         'details' => 'array', // JSONB 필드를 배열로 자동 캐스팅
-=======
         'details' => 'array', // JSONB 필드를 배열로 자동 캐스팅 (하위 호환성)
         'prepayment_due_date' => 'datetime',
         'balance_due_date' => 'datetime',
@@ -40,15 +38,12 @@ class RfpElement extends Model
         'spec_fields' => 'array',
         'spec_variants' => 'array',
         'use_variants' => 'boolean',
->>>>>>> Stashed changes
     ];
 
     public function rfp()
     {
         return $this->belongsTo(Rfp::class);
     }
-<<<<<<< Updated upstream
-=======
 
     public function elementDefinition()
     {
@@ -111,5 +106,4 @@ class RfpElement extends Model
         
         return $errors;
     }
->>>>>>> Stashed changes
 }

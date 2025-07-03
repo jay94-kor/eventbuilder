@@ -16,9 +16,7 @@ class ElementDefinition extends Model
         'description',
         'input_schema',
         'default_details_template',
-<<<<<<< Updated upstream
         'recommended_elements',
-=======
         'complexity_level',
         'event_types',
         
@@ -26,16 +24,12 @@ class ElementDefinition extends Model
         'default_spec_template',
         'quantity_config',
         'variant_rules',
->>>>>>> Stashed changes
     ];
 
     protected $casts = [
         'input_schema' => 'array',
         'default_details_template' => 'array',
         'recommended_elements' => 'array',
-<<<<<<< Updated upstream
-    ];
-=======
         'event_types' => 'array',
         'popularity_score' => 'integer',
         
@@ -133,5 +127,4 @@ class ElementDefinition extends Model
     {
         return $this->variant_rules['require_name'] ?? false;
     }
->>>>>>> Stashed changes
 }
