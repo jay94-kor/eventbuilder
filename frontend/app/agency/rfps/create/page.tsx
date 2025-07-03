@@ -74,8 +74,32 @@ export default function CreateRfpPage() {
     return true;
   };
 
+  const validateStep3 = () => {
+    // Step 3에서는 상세 사양만 검증 (예산 관련 검증은 Step 4로 이동)
+    return true;
+  };
+
+  const validateStep4 = () => {
+    // 예산 검증
+    for (const element of formData.elements) {
+      if (!element.allocated_budget || element.allocated_budget <= 0) {
+        setError(`${element.element_type} 요소의 할당 예산을 입력해주세요.`);
+        return false;
+      }
+    }
+
+    // 총 예산 검증
+    const totalAllocated = formData.elements.reduce((sum, element) => sum + Number(element.allocated_budget), 0);
+    if (totalAllocated > formData.budget_including_vat) {
+      setError('할당 예산 총합이 전체 프로젝트 예산을 초과했습니다.');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
-    if (!validateStep1() || !validateStep2()) {
+    if (!validateStep1() || !validateStep2() || !validateStep3() || !validateStep4()) {
       return;
     }
 
@@ -128,6 +152,9 @@ export default function CreateRfpPage() {
     if (currentStep === 2 && !validateStep2()) {
       return;
     }
+    if (currentStep === 3 && !validateStep3()) {
+      return;
+    }
     setError(null);
     setCurrentStep(currentStep + 1);
   };
@@ -174,6 +201,7 @@ export default function CreateRfpPage() {
             handlePrevStep={prevStep}
             error={error}
             isSubmitting={isSubmitting}
+            onElementUpdate={handleElementUpdate}
           />
         );
       default:
@@ -230,84 +258,22 @@ export default function CreateRfpPage() {
         {/* 단계별 폼 */}
         {renderStep()}
 
-<<<<<<< Updated upstream
         {/* 네비게이션 버튼 */}
-        <div className="flex justify-between mt-8">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-          >
-            이전
-          </Button>
-          
-          <div className="space-x-4">
-            {currentStep < 4 ? (
-              <Button onClick={nextStep}>
-                다음
-              </Button>
-=======
-        {step === 1 && (
-          <Step1Form 
-          formData={formData} 
-            handleChange={handleFieldChange}
-          handleSwitchChange={handleSwitchChange} 
-            handleVenueTypeChange={handleVenueTypeChange}
-            handleDateChange={handleFieldDateChange} 
-            handleNumericChange={handleFieldNumericChange}
-            errorFields={errorFields}
-          />
-        )}
-
-        {step === 2 && (
-          <Step2Form
-            formData={formData}
-            setFormData={handleStep2FormDataChange}
-          />
-        )}
-
-        {step === 3 && (
-          <Step3Form
-            formData={formData}
-            selectedElementDefinitions={formData.selected_element_definitions}
-            rfpElements={formData.elements}
-            onRfpElementsChange={(elements) => setFormData({...formData, elements})}
-            onRemoveElement={(elementId) => {
-              setFormData({
-                ...formData,
-                selected_element_definitions: formData.selected_element_definitions.filter(e => e.id !== elementId),
-                elements: formData.elements.filter(e => e.element_id !== elementId),
-              });
-            }}
-          />
-        )}
-
-        {step === 4 && (
-           <div className="bg-white p-6 rounded-lg shadow-md">
-             <h2 className="text-xl font-semibold mb-6 text-gray-800 border-b border-gray-200 pb-2">4단계: 최종 확인</h2>
-             <div className="text-center py-8">
-               <p className="text-gray-600 mb-4">입력하신 내용을 확인 후 최종 생성 버튼을 눌러주세요.</p>
-             </div>
-           </div>
-        )}
-        
-        <div className="flex justify-between items-center mt-8">
-          {/* 왼쪽: 이전 버튼 */}
-          <div>
-            {step > 1 ? (
-              <Button variant="outline" onClick={handlePrevStep}>← 이전 단계</Button>
->>>>>>> Stashed changes
-            ) : (
-              <Button 
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {isSubmitting ? '생성 중...' : 'RFP 생성'}
-              </Button>
-            )}
+        {currentStep < 4 && (
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+            >
+              이전
+            </Button>
+            
+            <Button onClick={nextStep}>
+              다음
+            </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

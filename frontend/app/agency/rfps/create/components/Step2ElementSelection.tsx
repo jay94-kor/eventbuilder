@@ -1,70 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { RfpFormData } from '@/lib/types';
+import { elementDefinitionApi, ElementCategory } from '@/lib/api';
 
 interface Step2ElementSelectionProps {
   formData: RfpFormData;
   onElementsChange: (elements: RfpFormData['elements']) => void;
 }
 
-// 기본 요소 정의
-const DEFAULT_ELEMENTS = [
-  {
-    element_type: 'stage',
-    display_name: '무대',
-    description: '공연 및 발표를 위한 무대 설치',
-    category: 'structure'
-  },
-  {
-    element_type: 'sound_system',
-    display_name: '음향 시스템',
-    description: '스피커, 마이크, 음향 장비',
-    category: 'equipment'
-  },
-  {
-    element_type: 'lighting',
-    display_name: '조명',
-    description: '무대 조명 및 연출 조명',
-    category: 'equipment'
-  },
-  {
-    element_type: 'led_screen',
-    display_name: 'LED 스크린',
-    description: '대형 LED 디스플레이',
-    category: 'equipment'
-  },
-  {
-    element_type: 'decoration',
-    display_name: '장식',
-    description: '행사장 장식 및 꾸미기',
-    category: 'decoration'
-  },
-  {
-    element_type: 'catering',
-    display_name: '케이터링',
-    description: '음식 및 음료 서비스',
-    category: 'service'
-  },
-  {
-    element_type: 'security',
-    display_name: '보안',
-    description: '행사장 보안 서비스',
-    category: 'service'
-  },
-  {
-    element_type: 'photography',
-    display_name: '사진/영상',
-    description: '행사 촬영 및 기록',
-    category: 'service'
-  }
-];
-
 export default function Step2ElementSelection({ formData, onElementsChange }: Step2ElementSelectionProps) {
   const [selectedElements, setSelectedElements] = useState<string[]>(
     formData.elements.map(el => el.element_type)
   );
+  const [categories, setCategories] = useState<ElementCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const data = await elementDefinitionApi.getGroupedByCategory();
+        setCategories(data);
+      } catch (err) {
+        console.error('카테고리 목록 로딩 실패:', err);
+        setError('요소 목록을 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleElementToggle = (elementType: string, checked: boolean) => {
     let newSelectedElements: string[];
@@ -99,21 +68,37 @@ export default function Step2ElementSelection({ formData, onElementsChange }: St
     onElementsChange(newElements);
   };
 
-  const groupedElements = DEFAULT_ELEMENTS.reduce((groups, element) => {
-    const category = element.category;
-    if (!groups[category]) {
-      groups[category] = [];
+  const getElementDisplayName = (elementType: string): string => {
+    for (const category of categories) {
+      const element = category.elements.find(el => el.element_type === elementType);
+      if (element) {
+        return element.display_name;
+      }
     }
-    groups[category].push(element);
-    return groups;
-  }, {} as Record<string, typeof DEFAULT_ELEMENTS>);
-
-  const categoryNames = {
-    structure: '구조물',
-    equipment: '장비',
-    decoration: '장식',
-    service: '서비스'
+    return elementType;
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-6">2단계: 요소 선택</h2>
+        <div className="flex items-center justify-center h-32">
+          <div className="text-gray-500">요소 목록을 불러오는 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-6">2단계: 요소 선택</h2>
+        <div className="flex items-center justify-center h-32">
+          <div className="text-red-500">{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
@@ -121,14 +106,17 @@ export default function Step2ElementSelection({ formData, onElementsChange }: St
       <p className="text-gray-600 mb-6">행사에 필요한 요소들을 선택해주세요.</p>
       
       <div className="space-y-6">
-        {Object.entries(groupedElements).map(([category, elements]) => (
-          <Card key={category}>
+        {categories.map((category) => (
+          <Card key={category.category}>
             <CardHeader>
-              <CardTitle className="text-lg">{categoryNames[category as keyof typeof categoryNames]}</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <span>{category.icon}</span>
+                {category.name}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {elements.map((element) => (
+                {category.elements.map((element) => (
                   <div key={element.element_type} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                     <Checkbox
                       id={element.element_type}
@@ -154,14 +142,11 @@ export default function Step2ElementSelection({ formData, onElementsChange }: St
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
         <h3 className="font-medium text-blue-800 mb-2">선택된 요소: {selectedElements.length}개</h3>
         <div className="flex flex-wrap gap-2">
-          {selectedElements.map(type => {
-            const element = DEFAULT_ELEMENTS.find(el => el.element_type === type);
-            return (
-              <span key={type} className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded">
-                {element?.display_name}
-              </span>
-            );
-          })}
+          {selectedElements.map(type => (
+            <span key={type} className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded">
+              {getElementDisplayName(type)}
+            </span>
+          ))}
         </div>
       </div>
     </div>

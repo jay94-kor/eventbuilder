@@ -20,7 +20,26 @@ interface Step4OrderAndAnnouncementProps {
   handlePrevStep: () => void;
   error: string | null;
   isSubmitting: boolean;
+  onElementUpdate: (elementIndex: number, field: string, value: any) => void;
 }
+
+const formatDateForDisplay = (dateString: string) => {
+  if (!dateString) return "날짜 선택";
+  try {
+    return format(new Date(dateString), "yyyy-MM-dd");
+  } catch {
+    return "날짜 선택";
+  }
+};
+
+const stringToDate = (dateString: string): Date | undefined => {
+  if (!dateString) return undefined;
+  try {
+    return new Date(dateString);
+  } catch {
+    return undefined;
+  }
+};
 
 export const Step4OrderAndAnnouncement: React.FC<Step4OrderAndAnnouncementProps> = ({
   formData,
@@ -31,7 +50,30 @@ export const Step4OrderAndAnnouncement: React.FC<Step4OrderAndAnnouncementProps>
   handlePrevStep,
   error,
   isSubmitting,
+  onElementUpdate,
 }) => {
+  const handleFieldChange = (elementIndex: number, field: string, value: any) => {
+    onElementUpdate(elementIndex, field, value);
+  };
+
+  const handleDateChange = (elementIndex: number, field: string, date: Date | undefined) => {
+    const dateString = date ? date.toISOString().split('T')[0] : '';
+    onElementUpdate(elementIndex, field, dateString);
+  };
+
+  const getElementDisplayName = (elementType: string) => {
+    const elementNames: Record<string, string> = {
+      stage: '무대',
+      sound_system: '음향 시스템',
+      lighting: '조명',
+      led_screen: 'LED 스크린',
+      decoration: '장식',
+      catering: '케이터링',
+      security: '보안',
+      photography: '사진/영상'
+    };
+    return elementNames[elementType] || elementType;
+  };
   return (
     <div className="space-y-6">
       <Card>
@@ -67,6 +109,127 @@ export const Step4OrderAndAnnouncement: React.FC<Step4OrderAndAnnouncementProps>
               </label>
             </div>
           </div>
+
+          <Separator />
+          <h3 className="text-lg font-semibold">예산 배정 및 지급 조건</h3>
+          <p className="text-sm text-muted-foreground mb-4">각 요소별 예산과 지급 조건을 설정해주세요.</p>
+          
+          <div className="space-y-4">
+            {formData.elements.map((element, index) => (
+              <Card key={index} className="bg-gray-50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">{getElementDisplayName(element.element_type)}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`budget-${index}`}>할당 예산 (원) <span className="text-red-500">*</span></Label>
+                      <Input
+                        id={`budget-${index}`}
+                        type="number"
+                        value={element.allocated_budget}
+                        onChange={(e) => handleFieldChange(index, 'allocated_budget', Number(e.target.value))}
+                        placeholder="예: 10000000"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`prepayment-${index}`}>선급금 비율 (%)</Label>
+                      <Input
+                        id={`prepayment-${index}`}
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={element.prepayment_ratio * 100}
+                        onChange={(e) => handleFieldChange(index, 'prepayment_ratio', Number(e.target.value) / 100)}
+                        placeholder="예: 30 (30%)"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`prepayment-date-${index}`}>선급금 지급일</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formatDateForDisplay(element.prepayment_due_date)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={stringToDate(element.prepayment_due_date)}
+                            onSelect={(date) => handleDateChange(index, 'prepayment_due_date', date)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div>
+                      <Label htmlFor={`balance-date-${index}`}>잔금 지급일</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formatDateForDisplay(element.balance_due_date)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={stringToDate(element.balance_due_date)}
+                            onSelect={(date) => handleDateChange(index, 'balance_due_date', date)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* 예산 요약 */}
+          <Card className="mt-4 bg-blue-50 border-blue-200">
+            <CardHeader>
+              <CardTitle className="text-lg text-blue-800">예산 요약</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {formData.elements.map((element, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span>{getElementDisplayName(element.element_type)}</span>
+                    <span className="font-medium">
+                      {Number(element.allocated_budget).toLocaleString('ko-KR')}원
+                    </span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between items-center font-bold">
+                    <span>총 할당 예산</span>
+                    <span>
+                      {formData.elements
+                        .reduce((sum, element) => sum + Number(element.allocated_budget), 0)
+                        .toLocaleString('ko-KR')}원
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    전체 프로젝트 예산: {Number(formData.budget_including_vat).toLocaleString('ko-KR')}원
+                  </div>
+                  {formData.elements.reduce((sum, element) => sum + Number(element.allocated_budget), 0) > formData.budget_including_vat && (
+                    <div className="text-sm text-red-600 mt-1 font-medium">
+                      ⚠️ 할당 예산이 전체 예산을 초과했습니다!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <Separator />
           <h3 className="text-lg font-semibold">평가 및 협상 일정</h3>

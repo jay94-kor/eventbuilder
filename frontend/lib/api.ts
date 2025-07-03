@@ -71,4 +71,92 @@ api.interceptors.response.use(
   }
 );
 
+// ElementDefinition 관련 타입 정의
+export interface ElementDefinition {
+  id: string;
+  element_type: string;
+  display_name: string;
+  description?: string;
+  input_schema?: Record<string, any>;
+  default_details_template?: Record<string, any>;
+  recommended_elements?: string[];
+  complexity_level?: number;
+  event_types?: string[];
+  default_spec_template?: Record<string, any>;
+  quantity_config?: Record<string, any>;
+  variant_rules?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ElementCategory {
+  category: string;
+  name: string;
+  icon: string;
+  elements: ElementDefinition[];
+}
+
+export interface ElementWithSpecTemplate {
+  element: ElementDefinition;
+  spec_fields: Array<{
+    id: string;
+    name: string;
+    unit?: string;
+    value: string;
+    type: string;
+    options?: string[];
+    required: boolean;
+    validation?: Record<string, any>;
+  }>;
+  quantity_config: {
+    unit: string;
+    typical: number;
+    range: { min: number; max: number };
+    allow_variants: boolean;
+  };
+  variant_rules: {
+    allowed_fields: string[];
+    max_variants: number;
+    require_name: boolean;
+  };
+}
+
+// ElementDefinition API 함수들
+export const elementDefinitionApi = {
+  // 모든 요소 목록 조회
+  getAll: async (): Promise<ElementDefinition[]> => {
+    const response = await api.get('/element-definitions');
+    return response.data.elements;
+  },
+
+  // 카테고리별 그룹화된 요소 목록 조회
+  getGroupedByCategory: async (): Promise<ElementCategory[]> => {
+    const response = await api.get('/element-definitions/grouped');
+    return response.data.categories;
+  },
+
+  // 스펙 템플릿이 포함된 요소 정보 조회
+  getWithSpecTemplate: async (id: string): Promise<ElementWithSpecTemplate> => {
+    const response = await api.get(`/element-definitions/${id}/with-spec-template`);
+    return response.data.data;
+  },
+
+  // 요소 생성 (관리자 전용)
+  create: async (data: Partial<ElementDefinition>): Promise<ElementDefinition> => {
+    const response = await api.post('/element-definitions', data);
+    return response.data.elementDefinition;
+  },
+
+  // 요소 수정 (관리자 전용)
+  update: async (id: string, data: Partial<ElementDefinition>): Promise<ElementDefinition> => {
+    const response = await api.put(`/element-definitions/${id}`, data);
+    return response.data.elementDefinition;
+  },
+
+  // 요소 삭제 (관리자 전용)
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/element-definitions/${id}`);
+  },
+};
+
 export default api;

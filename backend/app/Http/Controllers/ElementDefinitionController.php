@@ -32,6 +32,115 @@ class ElementDefinitionController extends Controller
     }
 
     /**
+     * 카테고리별로 그룹화된 RFP 요소 정의 목록 조회 (GET /api/element-definitions/grouped)
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getGroupedByCategory(Request $request)
+    {
+        try {
+            $elements = ElementDefinition::orderBy('display_name')->get();
+            
+            // 요소 타입별로 그룹화 (실제 카테고리 테이블이 없으므로 element_type의 첫 단어로 그룹화)
+            $grouped = $elements->groupBy(function ($element) {
+                // element_type의 첫 번째 단어나 패턴으로 카테고리 분류
+                $type = $element->element_type;
+                
+                // 카테고리 매핑 로직
+                if (str_contains($type, 'sound') || str_contains($type, 'audio')) {
+                    return 'sound';
+                } elseif (str_contains($type, 'lighting') || str_contains($type, 'light')) {
+                    return 'lighting';
+                } elseif (str_contains($type, 'video') || str_contains($type, 'display')) {
+                    return 'video';
+                } elseif (str_contains($type, 'stage') || str_contains($type, 'backdrop')) {
+                    return 'stage';
+                } elseif (str_contains($type, 'decoration') || str_contains($type, 'flower')) {
+                    return 'decoration';
+                } elseif (str_contains($type, 'photo') || str_contains($type, 'camera')) {
+                    return 'photography';
+                } else {
+                    return 'other';
+                }
+            });
+
+            // 카테고리 정보 추가
+            $categories = [
+                'sound' => ['name' => '음향', 'icon' => '🔊'],
+                'lighting' => ['name' => '조명', 'icon' => '💡'],
+                'video' => ['name' => '영상', 'icon' => '📺'],
+                'stage' => ['name' => '무대', 'icon' => '🎭'],
+                'decoration' => ['name' => '장식', 'icon' => '🌸'],
+                'photography' => ['name' => '사진', 'icon' => '📸'],
+                'other' => ['name' => '기타', 'icon' => '📦'],
+            ];
+
+            $result = [];
+            foreach ($grouped as $categoryKey => $elements) {
+                $result[] = [
+                    'category' => $categoryKey,
+                    'name' => $categories[$categoryKey]['name'] ?? '기타',
+                    'icon' => $categories[$categoryKey]['icon'] ?? '📦',
+                    'elements' => $elements->values(),
+                ];
+            }
+
+            return response()->json([
+                'message' => '카테고리별 RFP 요소 정의 목록을 성공적으로 불러왔습니다.',
+                'categories' => $result,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => '카테고리별 요소 목록 조회 중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * 동적 스펙 템플릿이 포함된 요소 정보 조회 (GET /api/element-definitions/{id}/with-spec-template)
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWithSpecTemplate($id)
+    {
+        try {
+            $element = ElementDefinition::findOrFail($id);
+            
+            // 동적 스펙 필드 생성
+            $specFields = $element->createSpecFields();
+            
+            $result = [
+                'element' => $element,
+                'spec_fields' => $specFields,
+                'quantity_config' => [
+                    'unit' => $element->getQuantityUnit(),
+                    'typical' => $element->getTypicalQuantity(),
+                    'range' => $element->getQuantityRange(),
+                    'allow_variants' => $element->allowsVariants(),
+                ],
+                'variant_rules' => [
+                    'allowed_fields' => $element->getAllowedVariantFields(),
+                    'max_variants' => $element->getMaxVariants(),
+                    'require_name' => $element->requiresVariantName(),
+                ],
+            ];
+
+            return response()->json([
+                'message' => '요소 스펙 템플릿 정보를 성공적으로 불러왔습니다.',
+                'data' => $result,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => '요소 스펙 템플릿 조회 중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * 새로운 RFP 요소 정의 생성 (POST /api/element-definitions)
      * (관리자 전용)
      *
